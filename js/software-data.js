@@ -12,7 +12,6 @@ const SOFTWARE_DATA = {
         {
             id: "browsers",
             name: "TRÌNH DUYỆT WEB",
-            icon: "🌐",
             software: [
                 { id: "Google.Chrome", name: "Google Chrome", icon: "chrome.png" },
                 { id: "Mozilla.Firefox", name: "Mozilla Firefox", icon: "firefox.png" },
@@ -25,7 +24,6 @@ const SOFTWARE_DATA = {
         {
             id: "office",
             name: "VĂN PHÒNG & TÀI LIỆU",
-            icon: "📄",
             software: [
                 { id: "Microsoft.Office", name: "Microsoft Office", icon: "office.png" },
                 { id: "TheDocumentFoundation.LibreOffice", name: "LibreOffice", icon: "libreoffice.png" },
@@ -40,7 +38,6 @@ const SOFTWARE_DATA = {
         {
             id: "communication",
             name: "CHAT & LIÊN LẠC",
-            icon: "💬",
             software: [
                 { id: "Zoom.Zoom", name: "Zoom", icon: "zoom.png" },
                 { id: "Microsoft.Teams", name: "Microsoft Teams", icon: "teams.png" },
@@ -54,7 +51,6 @@ const SOFTWARE_DATA = {
         {
             id: "media",
             name: "ĐA PHƯƠNG TIỆN",
-            icon: "🎬",
             software: [
                 { id: "VideoLAN.VLC", name: "VLC Media Player", icon: "vlc.png" },
                 { id: "KMPlayer.KMPlayer", name: "KMPlayer", icon: "kmplayer.png" },
@@ -67,7 +63,6 @@ const SOFTWARE_DATA = {
         {
             id: "graphics",
             name: "ĐỒ HỌA & CHỈNH SỬA",
-            icon: "🎨",
             software: [
                 { id: "GIMP.GIMP", name: "GIMP", icon: "gimp.png" },
                 { id: "Inkscape.Inkscape", name: "Inkscape", icon: "inkscape.png" },
@@ -82,7 +77,6 @@ const SOFTWARE_DATA = {
         {
             id: "developer",
             name: "LẬP TRÌNH & DEV TOOLS",
-            icon: "💻",
             software: [
                 { id: "Microsoft.VisualStudioCode", name: "VS Code", icon: "vscode.png" },
                 { id: "Git.Git", name: "Git", icon: "git.png" },
@@ -101,7 +95,6 @@ const SOFTWARE_DATA = {
         {
             id: "utilities",
             name: "TIỆN ÍCH HỆ THỐNG",
-            icon: "🔧",
             software: [
                 { id: "7zip.7zip", name: "7-Zip", icon: "7zip.png" },
                 { id: "RARLab.WinRAR", name: "WinRAR", icon: "winrar.png" },
@@ -118,7 +111,6 @@ const SOFTWARE_DATA = {
         {
             id: "security",
             name: "BẢO MẬT & ANTIVIRUS",
-            icon: "🛡️",
             software: [
                 { id: "Malwarebytes.Malwarebytes", name: "Malwarebytes", icon: "malwarebytes.png" },
                 { id: "ESET.NOD32", name: "ESET NOD32", icon: "eset.png" },
@@ -130,7 +122,6 @@ const SOFTWARE_DATA = {
         {
             id: "runtime",
             name: "RUNTIME & FRAMEWORK",
-            icon: "⚙️",
             software: [
                 { id: "Microsoft.VCRedist.2015+.x64", name: "VC++ 2015-2022 x64", icon: "vcredist.png" },
                 { id: "Microsoft.VCRedist.2015+.x86", name: "VC++ 2015-2022 x86", icon: "vcredist.png" },
