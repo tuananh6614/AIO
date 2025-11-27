@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT-Box: All-In-One Toolkit</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="grid-lines"></div>
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <h1>IT-Box</h1>
+                <span class="logo-subtitle">All-In-One Toolkit</span>
+            </div>
+            <p class="tagline">Công cụ hỗ trợ kỹ thuật viên & dân văn phòng</p>
+        </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="tab-nav">
+        <div class="container">
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="installer">
+                    <span class="tab-icon">📦</span>
+                    <span class="tab-text">Auto Installer</span>
+                </button>
+                <button class="tab-btn" data-tab="rescue">
+                    <span class="tab-icon">🛠️</span>
+                    <span class="tab-text">Kho Cứu Hộ</span>
+                </button>
+                <button class="tab-btn" data-tab="online">
+                    <span class="tab-icon">🌐</span>
+                    <span class="tab-text">Tiện ích Online</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Tab 1: Auto Installer -->
+            <section class="tab-content active" id="installer">
+                <div class="section-header">
+                    <h2>🚀 Auto Installer</h2>
+                    <p>Chọn phần mềm cần cài → Tải Script → Chạy file .bat để cài tự động</p>
+                </div>
+
+                <!-- Search & Controls -->
+                <div class="controls-bar">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="searchInput" placeholder="Tìm kiếm phần mềm...">
+                        <button class="clear-search" id="clearSearch">✕</button>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" id="selectAll">
+                            <span>☑️</span> Chọn tất cả
+                        </button>
+                        <button class="btn btn-secondary" id="deselectAll">
+                            <span>⬜</span> Bỏ chọn
+                        </button>
+                        <button class="btn btn-primary" id="downloadScript">
+                            <span>⬇️</span> Tải Script (<span id="selectedCount">0</span>)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Software Categories -->
+                <div class="categories" id="softwareCategories">
+                    <!-- Dynamically generated -->
+                </div>
+            </section>
+
+            <!-- Tab 2: Rescue Tools -->
+            <section class="tab-content" id="rescue">
+                <div class="section-header">
+                    <h2>🛠️ Kho Cứu Hộ</h2>
+                    <p>Các tool portable cần thiết cho kỹ thuật viên</p>
+                </div>
+
+                <div class="rescue-grid" id="rescueTools">
+                    <!-- Dynamically generated -->
+                </div>
+            </section>
+
+            <!-- Tab 3: Online Utilities -->
+            <section class="tab-content" id="online">
+                <div class="section-header">
+                    <h2>🌐 Tiện ích Online</h2>
+                    <p>Các dịch vụ web hữu ích đang chạy trên server</p>
+                </div>
+
+                <div class="online-grid" id="onlineServices">
+                    <!-- Dynamically generated -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 IT-Box Toolkit | Made with ❤️ for IT Technicians</p>
+            <p class="footer-note">Powered by Winget & Open Source Tools</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span class="toast-icon">✅</span>
+        <span class="toast-message" id="toastMessage">Thông báo</span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/software-data.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
