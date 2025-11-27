@@ -1,22 +1,21 @@
 /**
- * IT-Box: Main Logic
- * File này xử lý toàn bộ logic của ứng dụng
- * Data được import từ software-data.js
+ * AIO - All-In-One Toolkit
+ * Main Logic - Ninite-style UI
  */
 
 // ========================================
 // DOM Elements
 // ========================================
 const DOM = {
-    tabButtons: document.querySelectorAll('.tab-btn'),
+    navLinks: document.querySelectorAll('.nav-link'),
     tabContents: document.querySelectorAll('.tab-content'),
     softwareCategories: document.getElementById('softwareCategories'),
     searchInput: document.getElementById('searchInput'),
     clearSearch: document.getElementById('clearSearch'),
-    selectAll: document.getElementById('selectAll'),
     deselectAll: document.getElementById('deselectAll'),
     downloadScript: document.getElementById('downloadScript'),
     selectedCount: document.getElementById('selectedCount'),
+    bottomBar: document.getElementById('bottomBar'),
     rescueTools: document.getElementById('rescueTools'),
     onlineServices: document.getElementById('onlineServices'),
     toast: document.getElementById('toast'),
@@ -29,22 +28,13 @@ const DOM = {
 const State = {
     selectedSoftware: new Set(),
     
-    addSoftware(id) {
-        this.selectedSoftware.add(id);
-        this.updateUI();
-    },
-    
-    removeSoftware(id) {
-        this.selectedSoftware.delete(id);
-        this.updateUI();
-    },
-    
-    toggleSoftware(id) {
+    toggle(id) {
         if (this.selectedSoftware.has(id)) {
-            this.removeSoftware(id);
+            this.selectedSoftware.delete(id);
         } else {
-            this.addSoftware(id);
+            this.selectedSoftware.add(id);
         }
+        this.updateUI();
     },
     
     clearAll() {
@@ -52,26 +42,21 @@ const State = {
         this.updateUI();
     },
     
-    selectAllVisible() {
-        document.querySelectorAll('.software-card:not(.hidden)').forEach(card => {
-            this.selectedSoftware.add(card.dataset.id);
-        });
-        this.updateUI();
-    },
-    
     updateUI() {
-        DOM.selectedCount.textContent = this.selectedSoftware.size;
-        document.querySelectorAll('.software-card').forEach(card => {
-            const checkbox = card.querySelector('.software-checkbox');
-            if (this.selectedSoftware.has(card.dataset.id)) {
-                card.classList.add('selected');
-                checkbox.checked = true;
-            } else {
-                card.classList.remove('selected');
-                checkbox.checked = false;
-            }
+        const count = this.selectedSoftware.size;
+        DOM.selectedCount.textContent = count;
+        
+        // Update items
+        document.querySelectorAll('.software-item').forEach(item => {
+            const checkbox = item.querySelector('.software-checkbox');
+            const isSelected = this.selectedSoftware.has(item.dataset.id);
+            item.classList.toggle('selected', isSelected);
+            checkbox.checked = isSelected;
         });
-        DOM.downloadScript.disabled = this.selectedSoftware.size === 0;
+        
+        // Show/hide bottom bar
+        DOM.bottomBar.classList.toggle('visible', count > 0);
+        DOM.downloadScript.disabled = count === 0;
     }
 };
 
@@ -79,16 +64,18 @@ const State = {
 // Tab Navigation
 // ========================================
 function initTabs() {
-    DOM.tabButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const targetTab = btn.dataset.tab;
-            DOM.tabButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+    DOM.navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetTab = link.dataset.tab;
+            
+            // Update nav links
+            DOM.navLinks.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+            
+            // Update tab contents
             DOM.tabContents.forEach(content => {
-                content.classList.remove('active');
-                if (content.id === targetTab) {
-                    content.classList.add('active');
-                }
+                content.classList.toggle('active', content.id === targetTab);
             });
         });
     });
@@ -104,54 +91,37 @@ function renderSoftwareCategories() {
         const categoryEl = document.createElement('div');
         categoryEl.className = 'category';
         categoryEl.innerHTML = `
-            <div class="category-header" data-category="${category.id}">
-                <span class="category-icon">${category.icon}</span>
-                <h3 class="category-title">${category.name}</h3>
-                <span class="category-count">${category.software.length} phần mềm</span>
-                <span class="category-toggle">▼</span>
-            </div>
+            <div class="category-header">${category.name}</div>
             <div class="category-content">
-                ${category.software.map(sw => renderSoftwareCard(sw)).join('')}
+                ${category.software.map(sw => renderSoftwareItem(sw)).join('')}
             </div>
         `;
         DOM.softwareCategories.appendChild(categoryEl);
     });
     
-    addSoftwareCardListeners();
-    addCategoryToggleListeners();
+    addSoftwareItemListeners();
 }
 
-function renderSoftwareCard(software) {
-    const iconPath = `assets/icons/${software.icon}`;
-    const iconFallback = software.name.charAt(0).toUpperCase();
-    
+// Render software item - Checklist style (no icon)
+function renderSoftwareItem(software) {
     return `
-        <div class="software-card" data-id="${software.id}" data-name="${software.name.toLowerCase()}">
-            <input type="checkbox" class="software-checkbox" tabindex="-1">
-            <img src="${iconPath}" alt="${software.name}" class="software-icon" 
-                 onerror="this.outerHTML='<div class=\\'software-icon placeholder\\'>${iconFallback}</div>'">
-            <span class="software-name">${software.name}</span>
+        <div class="software-item" data-id="${software.id}" data-name="${software.name.toLowerCase()}">
+            <input type="checkbox" class="software-checkbox" id="sw-${software.id.replace(/\./g, '-')}">
+            <label class="software-label" for="sw-${software.id.replace(/\./g, '-')}">${software.name}</label>
         </div>
     `;
 }
 
-function addSoftwareCardListeners() {
-    document.querySelectorAll('.software-card').forEach(card => {
-        card.addEventListener('click', (e) => {
-            if (e.target.classList.contains('software-checkbox')) return;
-            State.toggleSoftware(card.dataset.id);
+function addSoftwareItemListeners() {
+    document.querySelectorAll('.software-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            // Prevent double-trigger from checkbox/label
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'LABEL') return;
+            State.toggle(item.dataset.id);
         });
         
-        card.querySelector('.software-checkbox').addEventListener('change', () => {
-            State.toggleSoftware(card.dataset.id);
-        });
-    });
-}
-
-function addCategoryToggleListeners() {
-    document.querySelectorAll('.category-header').forEach(header => {
-        header.addEventListener('click', () => {
-            header.closest('.category').classList.toggle('collapsed');
+        item.querySelector('.software-checkbox').addEventListener('change', () => {
+            State.toggle(item.dataset.id);
         });
     });
 }
@@ -170,26 +140,21 @@ function initSearch() {
 }
 
 function filterSoftware(query) {
-    document.querySelectorAll('.software-card').forEach(card => {
-        const name = card.dataset.name;
-        const id = card.dataset.id.toLowerCase();
-        card.classList.toggle('hidden', !name.includes(query) && !id.includes(query));
+    document.querySelectorAll('.software-item').forEach(item => {
+        const name = item.dataset.name;
+        const id = item.dataset.id.toLowerCase();
+        item.classList.toggle('hidden', !name.includes(query) && !id.includes(query));
     });
     
+    // Hide empty categories
     document.querySelectorAll('.category').forEach(category => {
-        const visible = category.querySelectorAll('.software-card:not(.hidden)').length;
-        category.style.display = visible === 0 ? 'none' : 'block';
-        if (query && visible > 0) category.classList.remove('collapsed');
+        const visible = category.querySelectorAll('.software-item:not(.hidden)').length;
+        category.style.display = visible === 0 ? 'none' : '';
     });
 }
 
 // Action buttons
 function initActionButtons() {
-    DOM.selectAll.addEventListener('click', () => {
-        State.selectAllVisible();
-        showToast('Đã chọn tất cả phần mềm hiển thị');
-    });
-    
     DOM.deselectAll.addEventListener('click', () => {
         State.clearAll();
         showToast('Đã bỏ chọn tất cả');
@@ -207,12 +172,12 @@ function generateAndDownloadScript() {
     
     let script = `@echo off
 chcp 65001 >nul
-title IT-Box Auto Installer
+title AIO - Auto Installer
 color 0A
 
 echo.
 echo  ╔══════════════════════════════════════════════════════════════╗
-echo  ║         IT-Box: All-In-One Toolkit - Auto Installer          ║
+echo  ║            AIO - All-In-One Toolkit - Auto Installer         ║
 echo  ╠══════════════════════════════════════════════════════════════╣
 echo  ║  So luong phan mem: ${String(selectedIds.length).padEnd(40)}║
 echo  ╚══════════════════════════════════════════════════════════════╝
@@ -280,7 +245,7 @@ echo Nhan phim bat ky de dong cua so...
 pause >nul
 `;
 
-    downloadFile('IT-Box-Installer.bat', script);
+    downloadFile('AIO-Installer.bat', script);
     showToast(`Đã tải script cài đặt ${selectedIds.length} phần mềm`);
 }
 
