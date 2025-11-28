@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   aio-web:
     build: .
@@ -7,7 +5,6 @@ services:
     ports:
       - "8080:80"
     volumes:
-      # Mount local files for live reload during development
       - ./index.html:/usr/share/nginx/html/index.html
       - ./css:/usr/share/nginx/html/css
       - ./js:/usr/share/nginx/html/js
