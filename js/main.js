@@ -165,116 +165,127 @@ function initActionButtons() {
     });
 }
 
-// Generate .bat script - Fixed CRLF + BOM for Windows
+// Generate .bat script - Pure ASCII for CMD compatibility
 function generateAndDownloadScript() {
     const selectedIds = Array.from(State.selectedSoftware);
     const total = selectedIds.length;
     
-    // Use array + join('\r\n') for proper Windows line endings
-    const lines = [];
+    // Build script content directly with CRLF
+    let script = '';
+    const addLine = (line = '') => { script += line + '\r\n'; };
     
     // Header
-    lines.push('@echo off');
-    lines.push('chcp 65001 >nul');
-    lines.push('title AIO - Auto Installer');
-    lines.push('color 0A');
-    lines.push('');
-    lines.push('echo.');
-    lines.push('echo ============================================================');
-    lines.push('echo            AIO - All-In-One Toolkit - Auto Installer');
-    lines.push('echo ============================================================');
-    lines.push(`echo    So luong phan mem: ${total}`);
-    lines.push('echo ============================================================');
-    lines.push('echo.');
-    lines.push('');
+    addLine('@echo off');
+    addLine('title AIO - Auto Installer');
+    addLine('color 0A');
+    addLine();
+    addLine('echo.');
+    addLine('echo ============================================================');
+    addLine('echo            AIO - All-In-One Toolkit - Auto Installer');
+    addLine('echo ============================================================');
+    addLine('echo    So luong phan mem: ' + total);
+    addLine('echo ============================================================');
+    addLine('echo.');
+    addLine();
     
     // Check Administrator
-    lines.push(':: Kiem tra quyen Administrator');
-    lines.push('net session >nul 2>&1');
-    lines.push('if %errorlevel% neq 0 (');
-    lines.push('    echo [LOI] Vui long chay file nay voi quyen Administrator!');
-    lines.push('    echo Click chuot phai -^> Run as administrator');
-    lines.push('    pause');
-    lines.push('    exit /b 1');
-    lines.push(')');
-    lines.push('');
+    addLine('net session >nul 2>&1');
+    addLine('if %errorlevel% neq 0 (');
+    addLine('    echo [LOI] Vui long chay voi quyen Administrator!');
+    addLine('    echo Click chuot phai - Run as administrator');
+    addLine('    pause');
+    addLine('    exit /b 1');
+    addLine(')');
+    addLine();
     
     // Check Winget
-    lines.push(':: Kiem tra Winget');
-    lines.push('where winget >nul 2>&1');
-    lines.push('if %errorlevel% neq 0 (');
-    lines.push('    echo [LOI] Winget chua duoc cai dat!');
-    lines.push('    echo Vui long cai App Installer tu Microsoft Store.');
-    lines.push('    start ms-windows-store://pdp/?productid=9NBLGGH4NNS1');
-    lines.push('    pause');
-    lines.push('    exit /b 1');
-    lines.push(')');
-    lines.push('');
+    addLine('where winget >nul 2>&1');
+    addLine('if %errorlevel% neq 0 (');
+    addLine('    echo [LOI] Winget chua duoc cai dat!');
+    addLine('    echo Vui long cai App Installer tu Microsoft Store.');
+    addLine('    start ms-windows-store://pdp/?productid=9NBLGGH4NNS1');
+    addLine('    pause');
+    addLine('    exit /b 1');
+    addLine(')');
+    addLine();
     
     // Init counters
-    lines.push(`echo [INFO] Bat dau cai dat ${total} phan mem...`);
-    lines.push('echo.');
-    lines.push(`set /a total=${total}`);
-    lines.push('set /a current=0');
-    lines.push('set /a success=0');
-    lines.push('set /a failed=0');
-    lines.push('');
+    addLine('echo [INFO] Bat dau cai dat ' + total + ' phan mem...');
+    addLine('echo.');
+    addLine('set /a total=' + total);
+    addLine('set /a current=0');
+    addLine('set /a success=0');
+    addLine('set /a failed=0');
+    addLine();
     
     // Install each software
     selectedIds.forEach((id, index) => {
         const software = findSoftwareById(id);
         const name = software ? software.name : id;
+        // Remove special characters from name for CMD
+        const safeName = name.replace(/[^a-zA-Z0-9\s\-\.\+]/g, '');
         
-        lines.push(`:: [${index + 1}/${total}] ${name}`);
-        lines.push('set /a current+=1');
-        lines.push('echo.');
-        lines.push('echo ------------------------------------------------------------');
-        lines.push(`echo [%current%/%total%] Dang cai dat: ${name}`);
-        lines.push('echo ------------------------------------------------------------');
-        lines.push(`winget install -e --id ${id} --silent --force --accept-package-agreements --accept-source-agreements`);
-        lines.push('if %errorlevel% equ 0 (');
-        lines.push(`    echo [OK] ${name} - Cai dat thanh cong!`);
-        lines.push('    set /a success+=1');
-        lines.push(') else (');
-        lines.push(`    echo [SKIP] ${name} - Da co hoac loi`);
-        lines.push('    set /a failed+=1');
-        lines.push(')');
-        lines.push('');
+        addLine('set /a current+=1');
+        addLine('echo.');
+        addLine('echo ------------------------------------------------------------');
+        addLine('echo [%current%/%total%] Dang cai dat: ' + safeName);
+        addLine('echo ------------------------------------------------------------');
+        addLine('winget install -e --id ' + id + ' --force --accept-package-agreements --accept-source-agreements');
+        addLine('if %errorlevel% equ 0 (');
+        addLine('    echo [OK] ' + safeName + ' - Thanh cong!');
+        addLine('    set /a success+=1');
+        addLine(') else (');
+        addLine('    echo [SKIP] ' + safeName + ' - Da co hoac loi');
+        addLine('    set /a failed+=1');
+        addLine(')');
+        addLine();
     });
     
     // Summary
-    lines.push('echo.');
-    lines.push('echo ============================================================');
-    lines.push('echo                    HOAN TAT CAI DAT');
-    lines.push('echo ============================================================');
-    lines.push('echo    Thanh cong: %success% / %total%');
-    lines.push('echo    That bai/Bo qua: %failed% / %total%');
-    lines.push('echo ============================================================');
-    lines.push('echo.');
-    lines.push('echo Nhan phim bat ky de dong cua so...');
-    lines.push('pause >nul');
+    addLine('echo.');
+    addLine('echo ============================================================');
+    addLine('echo                    HOAN TAT CAI DAT');
+    addLine('echo ============================================================');
+    addLine('echo    Thanh cong: %success% / %total%');
+    addLine('echo    That bai: %failed% / %total%');
+    addLine('echo ============================================================');
+    addLine('echo.');
+    addLine('echo Nhan phim bat ky de dong...');
+    addLine('pause >nul');
     
-    // Join with CRLF
-    const script = lines.join('\r\n');
-    
-    // Download with BOM
+    // Download as ASCII/ANSI (no BOM, no UTF-8)
     downloadBatFile('AIO-Installer.bat', script);
-    showToast(`Da tai script cai dat ${total} phan mem`);
+    showToast('Da tai script cai dat ' + total + ' phan mem');
 }
 
-// Download .bat file with BOM for UTF-8 support
+// Download .bat file - Manual byte encoding for CRLF
 function downloadBatFile(filename, content) {
-    // Add BOM (Byte Order Mark) for UTF-8
-    const BOM = '\uFEFF';
-    const blob = new Blob([BOM + content], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    try {
+        // Manually convert to bytes, ensuring \r\n stays as 0x0D 0x0A
+        const bytes = [];
+        for (let i = 0; i < content.length; i++) {
+            const charCode = content.charCodeAt(i);
+            // Only use ASCII range (0-127)
+            if (charCode < 128) {
+                bytes.push(charCode);
+            }
+        }
+        
+        const uint8Array = new Uint8Array(bytes);
+        const blob = new Blob([uint8Array], { type: 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Download error:', error);
+        alert('Loi tai file: ' + error.message);
+    }
 }
 
 function findSoftwareById(id) {
