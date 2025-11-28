@@ -13,12 +13,12 @@ const SOFTWARE_DATA = {
             id: "browsers",
             name: "TRÌNH DUYỆT WEB",
             software: [
-                { id: "Google.Chrome", name: "Google Chrome", icon: "chrome.png" },
+                { id: "Google.Chrome", name: "Google Chrome", icon: "icons8-google-chrome-48.png" },
                 { id: "Mozilla.Firefox", name: "Mozilla Firefox", icon: "firefox.png" },
-                { id: "Microsoft.Edge", name: "Microsoft Edge", icon: "edge.png" },
-                { id: "BraveSoftware.BraveBrowser", name: "Brave Browser", icon: "brave.png" },
-                { id: "Opera.Opera", name: "Opera", icon: "opera.png" },
-                { id: "Vivaldi.Vivaldi", name: "Vivaldi", icon: "vivaldi.png" }
+                { id: "Microsoft.Edge", name: "Microsoft Edge", icon: "icons8-microsoft-edge-48.png" },
+                { id: "BraveSoftware.BraveBrowser", name: "Brave Browser", icon: "icons8-brave-web-browser-48.png" },
+                { id: "Opera.Opera", name: "Opera", icon: "icons8-opera-48.png" },
+                { id: "CocCoc.CocCoc", name: "Cốc Cốc", icon: "icons8-coc-coc-48.png" }
             ]
         },
         {
@@ -89,7 +89,8 @@ const SOFTWARE_DATA = {
                 { id: "Postman.Postman", name: "Postman", icon: "postman.png" },
                 { id: "WinSCP.WinSCP", name: "WinSCP", icon: "winscp.png" },
                 { id: "PuTTY.PuTTY", name: "PuTTY", icon: "putty.png" },
-                { id: "Termius.Termius", name: "Termius", icon: "termius.png" }
+                { id: "Termius.Termius", name: "Termius", icon: "termius.png" },
+                { id: "ArduinoSA.IDE.stable", name: "Arduino IDE", icon: "arduino.png" }
             ]
         },
         {

@@ -102,11 +102,16 @@ function renderSoftwareCategories() {
     addSoftwareItemListeners();
 }
 
-// Render software item - Checklist style (no icon)
+// Render software item - With real icon from assets/icons/
 function renderSoftwareItem(software) {
+    const iconPath = `assets/icons/${software.icon}`;
+    const fallback = software.name.charAt(0).toUpperCase();
+    
     return `
         <div class="software-item" data-id="${software.id}" data-name="${software.name.toLowerCase()}">
             <input type="checkbox" class="software-checkbox" id="sw-${software.id.replace(/\./g, '-')}">
+            <img class="software-icon" src="${iconPath}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <span class="software-icon-fallback">${fallback}</span>
             <label class="software-label" for="sw-${software.id.replace(/\./g, '-')}">${software.name}</label>
         </div>
     `;
