@@ -165,88 +165,116 @@ function initActionButtons() {
     });
 }
 
-// Generate .bat script
+// Generate .bat script - Fixed CRLF + BOM for Windows
 function generateAndDownloadScript() {
     const selectedIds = Array.from(State.selectedSoftware);
-    const timestamp = new Date().toLocaleString('vi-VN');
+    const total = selectedIds.length;
     
-    let script = `@echo off
-chcp 65001 >nul
-title AIO - Auto Installer
-color 0A
-
-echo.
-echo  ╔══════════════════════════════════════════════════════════════╗
-echo  ║            AIO - All-In-One Toolkit - Auto Installer         ║
-echo  ╠══════════════════════════════════════════════════════════════╣
-echo  ║  So luong phan mem: ${String(selectedIds.length).padEnd(40)}║
-echo  ╚══════════════════════════════════════════════════════════════╝
-echo.
-
-:: Kiem tra quyen Administrator
-net session >nul 2>&1
-if %errorlevel% neq 0 (
-    echo [LOI] Vui long chay file nay voi quyen Administrator!
-    echo Click chuot phai -^> Run as administrator
-    pause
-    exit /b 1
-)
-
-:: Kiem tra Winget
-where winget >nul 2>&1
-if %errorlevel% neq 0 (
-    echo [LOI] Winget chua duoc cai dat!
-    echo Vui long cai App Installer tu Microsoft Store.
-    start ms-windows-store://pdp/?productid=9NBLGGH4NNS1
-    pause
-    exit /b 1
-)
-
-echo [INFO] Bat dau cai dat ${selectedIds.length} phan mem...
-echo.
-set /a total=${selectedIds.length}
-set /a current=0
-set /a success=0
-set /a failed=0
-
-`;
-
+    // Use array + join('\r\n') for proper Windows line endings
+    const lines = [];
+    
+    // Header
+    lines.push('@echo off');
+    lines.push('chcp 65001 >nul');
+    lines.push('title AIO - Auto Installer');
+    lines.push('color 0A');
+    lines.push('');
+    lines.push('echo.');
+    lines.push('echo ============================================================');
+    lines.push('echo            AIO - All-In-One Toolkit - Auto Installer');
+    lines.push('echo ============================================================');
+    lines.push(`echo    So luong phan mem: ${total}`);
+    lines.push('echo ============================================================');
+    lines.push('echo.');
+    lines.push('');
+    
+    // Check Administrator
+    lines.push(':: Kiem tra quyen Administrator');
+    lines.push('net session >nul 2>&1');
+    lines.push('if %errorlevel% neq 0 (');
+    lines.push('    echo [LOI] Vui long chay file nay voi quyen Administrator!');
+    lines.push('    echo Click chuot phai -^> Run as administrator');
+    lines.push('    pause');
+    lines.push('    exit /b 1');
+    lines.push(')');
+    lines.push('');
+    
+    // Check Winget
+    lines.push(':: Kiem tra Winget');
+    lines.push('where winget >nul 2>&1');
+    lines.push('if %errorlevel% neq 0 (');
+    lines.push('    echo [LOI] Winget chua duoc cai dat!');
+    lines.push('    echo Vui long cai App Installer tu Microsoft Store.');
+    lines.push('    start ms-windows-store://pdp/?productid=9NBLGGH4NNS1');
+    lines.push('    pause');
+    lines.push('    exit /b 1');
+    lines.push(')');
+    lines.push('');
+    
+    // Init counters
+    lines.push(`echo [INFO] Bat dau cai dat ${total} phan mem...`);
+    lines.push('echo.');
+    lines.push(`set /a total=${total}`);
+    lines.push('set /a current=0');
+    lines.push('set /a success=0');
+    lines.push('set /a failed=0');
+    lines.push('');
+    
+    // Install each software
     selectedIds.forEach((id, index) => {
         const software = findSoftwareById(id);
         const name = software ? software.name : id;
-        script += `
-:: [${index + 1}/${selectedIds.length}] ${name}
-set /a current+=1
-echo.
-echo ════════════════════════════════════════════════════════════════
-echo [%current%/%total%] Dang cai dat: ${name}
-echo ════════════════════════════════════════════════════════════════
-winget install -e --id ${id} --silent --accept-package-agreements --accept-source-agreements
-if %errorlevel% equ 0 (
-    echo [OK] ${name} - Cai dat thanh cong!
-    set /a success+=1
-) else (
-    echo [SKIP] ${name} - Da co hoac loi
-    set /a failed+=1
-)
-`;
+        
+        lines.push(`:: [${index + 1}/${total}] ${name}`);
+        lines.push('set /a current+=1');
+        lines.push('echo.');
+        lines.push('echo ------------------------------------------------------------');
+        lines.push(`echo [%current%/%total%] Dang cai dat: ${name}`);
+        lines.push('echo ------------------------------------------------------------');
+        lines.push(`winget install -e --id ${id} --silent --force --accept-package-agreements --accept-source-agreements`);
+        lines.push('if %errorlevel% equ 0 (');
+        lines.push(`    echo [OK] ${name} - Cai dat thanh cong!`);
+        lines.push('    set /a success+=1');
+        lines.push(') else (');
+        lines.push(`    echo [SKIP] ${name} - Da co hoac loi`);
+        lines.push('    set /a failed+=1');
+        lines.push(')');
+        lines.push('');
     });
+    
+    // Summary
+    lines.push('echo.');
+    lines.push('echo ============================================================');
+    lines.push('echo                    HOAN TAT CAI DAT');
+    lines.push('echo ============================================================');
+    lines.push('echo    Thanh cong: %success% / %total%');
+    lines.push('echo    That bai/Bo qua: %failed% / %total%');
+    lines.push('echo ============================================================');
+    lines.push('echo.');
+    lines.push('echo Nhan phim bat ky de dong cua so...');
+    lines.push('pause >nul');
+    
+    // Join with CRLF
+    const script = lines.join('\r\n');
+    
+    // Download with BOM
+    downloadBatFile('AIO-Installer.bat', script);
+    showToast(`Da tai script cai dat ${total} phan mem`);
+}
 
-    script += `
-echo.
-echo ╔══════════════════════════════════════════════════════════════╗
-echo ║                    HOAN TAT CAI DAT                          ║
-echo ╠══════════════════════════════════════════════════════════════╣
-echo ║  Thanh cong: %success% / %total%
-echo ║  That bai/Bo qua: %failed% / %total%
-echo ╚══════════════════════════════════════════════════════════════╝
-echo.
-echo Nhan phim bat ky de dong cua so...
-pause >nul
-`;
-
-    downloadFile('AIO-Installer.bat', script);
-    showToast(`Đã tải script cài đặt ${selectedIds.length} phần mềm`);
+// Download .bat file with BOM for UTF-8 support
+function downloadBatFile(filename, content) {
+    // Add BOM (Byte Order Mark) for UTF-8
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 function findSoftwareById(id) {
