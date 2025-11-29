@@ -1,14 +1,15 @@
 /* ========================================
    AIO - All-In-One Toolkit
-   Light Mode / Ninite-inspired Style
+   Multi-Theme System with Smooth Transitions
    ======================================== */
 
-/* CSS Variables */
+/* CSS Variables - Default Theme (Orange - Tab 1) */
 :root {
-    /* Color Palette */
+    /* Primary Colors - Will be overridden by themes */
     --primary: #E67E22;
     --primary-hover: #D35400;
     --primary-light: #FDEBD0;
+    --primary-rgb: 230, 126, 34;
     
     --secondary: #2C3E50;
     --secondary-light: #34495E;
@@ -28,12 +29,29 @@
     --font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
     
     /* Sizing */
-    --header-height: 60px;
+    --header-height: 70px;
     --bottom-bar-height: 70px;
     --container-width: 1200px;
     
     /* Transitions */
     --transition: 0.2s ease;
+    --theme-transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Theme: Rescue (Green - Tab 2) */
+body.theme-rescue {
+    --primary: #27AE60;
+    --primary-hover: #1E8449;
+    --primary-light: #D5F5E3;
+    --primary-rgb: 39, 174, 96;
+}
+
+/* Theme: Online (Blue - Tab 3) */
+body.theme-online {
+    --primary: #3498DB;
+    --primary-hover: #2980B9;
+    --primary-light: #D6EAF8;
+    --primary-rgb: 52, 152, 219;
 }
 
 /* Reset & Base */
@@ -66,11 +84,12 @@ body {
 /* ==================== HEADER ==================== */
 .header {
     background: var(--bg-white);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 2px solid var(--primary);
     height: var(--header-height);
     position: sticky;
     top: 0;
     z-index: 100;
+    box-shadow: 0 2px 10px rgba(var(--primary-rgb), 0.1);
 }
 
 .header-inner {
@@ -89,9 +108,25 @@ body {
 }
 
 .logo-img {
-    height: 45px;
+    height: 55px;
     width: auto;
-    mix-blend-mode: multiply;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.logo-img.fade-out {
+    opacity: 0;
+    transform: scale(0.95);
+}
+
+/* Theme transition for all colored elements */
+.header,
+.nav-link,
+.category-header,
+.software-item,
+.rescue-item-btn,
+.btn-primary,
+.bottom-bar {
+    transition: all var(--theme-transition);
 }
 
 /* Navigation */
@@ -126,10 +161,24 @@ body {
 
 .tab-content {
     display: none;
+    opacity: 0;
+    transform: translateY(10px);
 }
 
 .tab-content.active {
     display: block;
+    animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ==================== SEARCH ==================== */
@@ -209,6 +258,76 @@ body {
     padding: 0;
 }
 
+/* Category Toggle Button - Minimal Design */
+.category-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    background: var(--bg-gray);
+    border: none;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin-top: 4px;
+}
+
+.category-toggle:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.05);
+}
+
+.toggle-dots {
+    letter-spacing: 1px;
+    font-size: 0.7rem;
+}
+
+.toggle-count {
+    margin-left: 4px;
+    font-weight: 600;
+}
+
+/* When expanded - hide dots, show collapse hint */
+.category-toggle.expanded {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.category-toggle.expanded .toggle-dots,
+.category-toggle.expanded .toggle-count {
+    display: none;
+}
+
+.category-toggle.expanded::after {
+    content: "▲ Thu gọn";
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+/* Hidden Items */
+.software-item.hidden-item {
+    display: none;
+}
+
+.category-content:not(.collapsed) .software-item.hidden-item {
+    display: flex;
+    animation: slideDown 0.25s ease;
+}
+
+@keyframes slideDown {
+    from { 
+        opacity: 0; 
+        transform: translateY(-8px);
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0);
+    }
+}
+
 /* Software Item - Dense Checklist */
 .software-item {
     display: flex;
@@ -282,75 +401,87 @@ body {
     color: var(--primary);
 }
 
-/* ==================== RESCUE TOOLS ==================== */
-.rescue-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
+/* ==================== RESCUE TOOLS (Minimalist List) ==================== */
+.rescue-category {
+    margin-bottom: 24px;
 }
 
-.rescue-card {
+.rescue-category .category-header {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 2px solid var(--primary);
+    background: transparent;
+}
+
+.rescue-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.rescue-item {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 16px;
-    background: var(--bg-white);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: transparent;
+    border-radius: 4px;
     transition: var(--transition);
 }
 
-.rescue-card:hover {
-    border-color: var(--primary);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.rescue-item:hover {
+    background: var(--bg-gray);
 }
 
-.rescue-icon {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-gray);
-    border-radius: 8px;
-    font-size: 1.5rem;
+.rescue-item-name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+    white-space: nowrap;
     flex-shrink: 0;
 }
 
-.rescue-info {
+.rescue-item-spacer {
     flex: 1;
-    min-width: 0;
+    border-bottom: 1px dotted var(--border-color);
+    margin: 0 12px;
+    min-width: 20px;
 }
 
-.rescue-name {
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: var(--text-dark);
-    margin-bottom: 4px;
-}
-
-.rescue-desc {
+.rescue-item-desc {
     font-size: 0.8rem;
     color: var(--text-muted);
-    margin-bottom: 8px;
+    white-space: nowrap;
+    margin-right: 12px;
+    flex-shrink: 0;
 }
 
-.rescue-download {
-    display: inline-flex;
+.rescue-item-btn {
+    display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.rescue-item-btn:hover {
     background: var(--primary);
     color: #fff;
-    text-decoration: none;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    transition: var(--transition);
 }
 
-.rescue-download:hover {
-    background: var(--primary-hover);
+.rescue-item:hover .rescue-item-name {
+    color: var(--primary);
 }
 
 /* ==================== ONLINE SERVICES ==================== */
@@ -419,12 +550,12 @@ body {
     left: 0;
     right: 0;
     background: var(--bg-white);
-    border-top: 1px solid var(--border-color);
+    border-top: 3px solid var(--primary);
     padding: 12px 0;
     z-index: 100;
     transform: translateY(100%);
-    transition: transform 0.3s ease;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, border-color var(--theme-transition);
+    box-shadow: 0 -4px 20px rgba(var(--primary-rgb), 0.15);
 }
 
 .bottom-bar.visible {
@@ -597,6 +728,19 @@ body {
     .nav-link {
         padding: 6px 8px;
         font-size: 0.8rem;
+    }
+    
+    /* Rescue Tools responsive */
+    .rescue-item-spacer {
+        display: none;
+    }
+    
+    .rescue-item-desc {
+        display: none;
+    }
+    
+    .rescue-item-name {
+        flex: 1;
     }
 }
 

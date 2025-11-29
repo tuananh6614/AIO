@@ -61,8 +61,46 @@ const State = {
 };
 
 // ========================================
-// Tab Navigation
+// Tab Navigation & Theme System
 // ========================================
+const THEMES = {
+    installer: {
+        class: '',
+        logo: 'assets/logo/AIO logo.png'
+    },
+    rescue: {
+        class: 'theme-rescue',
+        logo: 'assets/logo/AIO logo2.png'
+    },
+    online: {
+        class: 'theme-online',
+        logo: 'assets/logo/AIO logo3.png'
+    }
+};
+
+function switchTheme(tabName) {
+    const theme = THEMES[tabName];
+    if (!theme) return;
+    
+    // Remove all theme classes
+    document.body.classList.remove('theme-rescue', 'theme-online');
+    
+    // Add new theme class
+    if (theme.class) {
+        document.body.classList.add(theme.class);
+    }
+    
+    // Animate logo change
+    const logoImg = document.querySelector('.logo-img');
+    if (logoImg && logoImg.src !== theme.logo) {
+        logoImg.classList.add('fade-out');
+        setTimeout(() => {
+            logoImg.src = theme.logo;
+            logoImg.classList.remove('fade-out');
+        }, 200);
+    }
+}
+
 function initTabs() {
     DOM.navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
@@ -72,6 +110,9 @@ function initTabs() {
             // Update nav links
             DOM.navLinks.forEach(l => l.classList.remove('active'));
             link.classList.add('active');
+            
+            // Switch theme with animation
+            switchTheme(targetTab);
             
             // Update tab contents
             DOM.tabContents.forEach(content => {
@@ -84,31 +125,65 @@ function initTabs() {
 // ========================================
 // Tab 1: Auto Installer
 // ========================================
+const VISIBLE_ITEMS_LIMIT = 5;
+
 function renderSoftwareCategories() {
     DOM.softwareCategories.innerHTML = '';
     
-    SOFTWARE_DATA.categories.forEach(category => {
+    SOFTWARE_DATA.categories.forEach((category, index) => {
+        const totalItems = category.software.length;
+        const hasMore = totalItems > VISIBLE_ITEMS_LIMIT;
+        const hiddenCount = totalItems - VISIBLE_ITEMS_LIMIT;
+        
         const categoryEl = document.createElement('div');
         categoryEl.className = 'category';
         categoryEl.innerHTML = `
             <div class="category-header">${category.name}</div>
-            <div class="category-content">
-                ${category.software.map(sw => renderSoftwareItem(sw)).join('')}
+            <div class="category-content ${hasMore ? 'collapsed' : ''}" data-category="${index}">
+                ${category.software.map((sw, i) => renderSoftwareItem(sw, hasMore && i >= VISIBLE_ITEMS_LIMIT)).join('')}
+                ${hasMore ? `
+                    <button class="category-toggle" data-category="${index}" data-count="${hiddenCount}" title="+${hiddenCount}">
+                        <span class="toggle-dots">•••</span>
+                        <span class="toggle-count">+${hiddenCount}</span>
+                    </button>
+                ` : ''}
             </div>
         `;
         DOM.softwareCategories.appendChild(categoryEl);
     });
     
     addSoftwareItemListeners();
+    addCategoryToggleListeners();
+}
+
+function addCategoryToggleListeners() {
+    document.querySelectorAll('.category-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const categoryIndex = btn.dataset.category;
+            const content = btn.closest('.category-content');
+            const isExpanded = !content.classList.contains('collapsed');
+            
+            if (isExpanded) {
+                // Collapse
+                content.classList.add('collapsed');
+                btn.classList.remove('expanded');
+            } else {
+                // Expand
+                content.classList.remove('collapsed');
+                btn.classList.add('expanded');
+            }
+        });
+    });
 }
 
 // Render software item - With real icon from assets/icons/
-function renderSoftwareItem(software) {
+function renderSoftwareItem(software, isHidden = false) {
     const iconPath = `assets/icons/${software.icon}`;
     const fallback = software.name.charAt(0).toUpperCase();
+    const hiddenClass = isHidden ? ' hidden-item' : '';
     
     return `
-        <div class="software-item" data-id="${software.id}" data-name="${software.name.toLowerCase()}">
+        <div class="software-item${hiddenClass}" data-id="${software.id}" data-name="${software.name.toLowerCase()}">
             <input type="checkbox" class="software-checkbox" id="sw-${software.id.replace(/\./g, '-')}">
             <img class="software-icon" src="${iconPath}" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
             <span class="software-icon-fallback">${fallback}</span>
@@ -179,9 +254,30 @@ function generateAndDownloadScript() {
     let script = '';
     const addLine = (line = '') => { script += line + '\r\n'; };
     
-    // Header
+    // Header + Auto-Elevate to Administrator
     addLine('@echo off');
-    addLine('title AIO - Auto Installer');
+    addLine('setlocal EnableDelayedExpansion');
+    addLine();
+    addLine(':: Check for admin rights and self-elevate if needed');
+    addLine('set "SCRIPT_PATH=%~f0"');
+    addLine('net session >nul 2>&1');
+    addLine('if %errorlevel% neq 0 (');
+    addLine('    echo.');
+    addLine('    echo ============================================');
+    addLine('    echo    Dang yeu cau quyen Administrator...');
+    addLine('    echo    Vui long chon YES trong hop thoai tiep theo');
+    addLine('    echo ============================================');
+    addLine('    echo.');
+    addLine('    timeout /t 2 >nul');
+    addLine('    powershell -Command "Start-Process cmd -ArgumentList \'/c \"\"%SCRIPT_PATH%\"\"\' -Verb RunAs"');
+    addLine('    exit /b 0');
+    addLine(')');
+    addLine();
+    addLine(':: ============================================');
+    addLine(':: RUNNING AS ADMINISTRATOR');
+    addLine(':: ============================================');
+    addLine('title AIO - Auto Installer [Administrator]');
+    addLine('mode con: cols=70 lines=30');
     addLine('color 0A');
     addLine();
     addLine('echo.');
@@ -189,18 +285,9 @@ function generateAndDownloadScript() {
     addLine('echo            AIO - All-In-One Toolkit - Auto Installer');
     addLine('echo ============================================================');
     addLine('echo    So luong phan mem: ' + total);
+    addLine('echo    Dang chay voi quyen Administrator');
     addLine('echo ============================================================');
     addLine('echo.');
-    addLine();
-    
-    // Check Administrator
-    addLine('net session >nul 2>&1');
-    addLine('if %errorlevel% neq 0 (');
-    addLine('    echo [LOI] Vui long chay voi quyen Administrator!');
-    addLine('    echo Click chuot phai - Run as administrator');
-    addLine('    pause');
-    addLine('    exit /b 1');
-    addLine(')');
     addLine();
     
     // Check Winget
@@ -304,19 +391,52 @@ function findSoftwareById(id) {
 // ========================================
 // Tab 2: Rescue Tools
 // ========================================
+const RESCUE_CATEGORIES = {
+    boot: "BOOT & CÀI WIN",
+    info: "THÔNG TIN PHẦN CỨNG",
+    disk: "QUẢN LÝ Ổ CỨNG",
+    driver: "DRIVER",
+    benchmark: "KIỂM TRA & STRESS TEST",
+    rescue: "BỘ CÔNG CỤ CỨU HỘ"
+};
+
 function renderRescueTools() {
-    DOM.rescueTools.innerHTML = RESCUE_TOOLS.map(tool => `
-        <div class="rescue-card">
-            <div class="rescue-icon">${tool.icon}</div>
-            <div class="rescue-info">
-                <h3 class="rescue-name">${tool.name}</h3>
-                <p class="rescue-desc">${tool.description}</p>
-                <a href="repo/${tool.filename}" class="rescue-download" download>
-                    ⬇️ Tải về
-                </a>
+    // Nhóm tools theo category
+    const grouped = RESCUE_TOOLS.reduce((acc, tool) => {
+        const cat = tool.category || 'other';
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(tool);
+        return acc;
+    }, {});
+    
+    // Render theo từng nhóm
+    let html = '';
+    for (const [catId, tools] of Object.entries(grouped)) {
+        const catName = RESCUE_CATEGORIES[catId] || catId.toUpperCase();
+        html += `
+            <div class="rescue-category">
+                <h3 class="category-header">${catName}</h3>
+                <div class="rescue-list">
+                    ${tools.map(tool => `
+                        <div class="rescue-item">
+                            <span class="rescue-item-name">${tool.name}</span>
+                            <span class="rescue-item-spacer"></span>
+                            <span class="rescue-item-desc">${tool.description}</span>
+                            <a href="repo/${tool.filename}" class="rescue-item-btn" download title="Tải ${tool.name}">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                            </a>
+                        </div>
+                    `).join('')}
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }
+    
+    DOM.rescueTools.innerHTML = html;
 }
 
 // ========================================

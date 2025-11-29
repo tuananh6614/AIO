@@ -133,128 +133,41 @@ const SOFTWARE_DATA = {
 
 // ========================================
 // TAB 2: RESCUE TOOLS - Các tool portable
+// Lưu ý: Đặt file thật vào thư mục /repo/ với tên khớp filename
 // ========================================
 const RESCUE_TOOLS = [
-    {
-        id: "rufus",
-        name: "Rufus",
-        description: "Tạo USB Boot cài Windows/Linux",
-        icon: "💿",
-        filename: "rufus.exe",
-        category: "boot"
-    },
-    {
-        id: "ventoy",
-        name: "Ventoy",
-        description: "Tạo USB Multi-boot",
-        icon: "🔄",
-        filename: "ventoy.zip",
-        category: "boot"
-    },
-    {
-        id: "cpuz",
-        name: "CPU-Z",
-        description: "Xem thông tin CPU chi tiết",
-        icon: "🔬",
-        filename: "cpu-z.zip",
-        category: "info"
-    },
-    {
-        id: "gpuz",
-        name: "GPU-Z",
-        description: "Xem thông tin Card đồ họa",
-        icon: "🎮",
-        filename: "gpu-z.exe",
-        category: "info"
-    },
-    {
-        id: "hwinfo",
-        name: "HWiNFO",
-        description: "Thông tin phần cứng toàn diện",
-        icon: "🖥️",
-        filename: "hwinfo.zip",
-        category: "info"
-    },
-    {
-        id: "crystaldiskinfo",
-        name: "CrystalDiskInfo",
-        description: "Kiểm tra sức khỏe ổ cứng",
-        icon: "💾",
-        filename: "crystaldiskinfo.zip",
-        category: "disk"
-    },
-    {
-        id: "crystaldiskmark",
-        name: "CrystalDiskMark",
-        description: "Benchmark tốc độ ổ cứng",
-        icon: "⚡",
-        filename: "crystaldiskmark.zip",
-        category: "disk"
-    },
-    {
-        id: "minitool",
-        name: "MiniTool Partition",
-        description: "Quản lý phân vùng ổ cứng",
-        icon: "📊",
-        filename: "minitool.zip",
-        category: "disk"
-    },
-    {
-        id: "dduninst",
-        name: "DDU",
-        description: "Gỡ sạch driver VGA",
-        icon: "🧹",
-        filename: "ddu.zip",
-        category: "driver"
-    },
-    {
-        id: "snappydriver",
-        name: "Snappy Driver",
-        description: "Cài driver offline",
-        icon: "📦",
-        filename: "snappy.zip",
-        category: "driver"
-    },
-    {
-        id: "aida64",
-        name: "AIDA64",
-        description: "Stress test & Benchmark",
-        icon: "🔥",
-        filename: "aida64.zip",
-        category: "benchmark"
-    },
-    {
-        id: "furmark",
-        name: "FurMark",
-        description: "Stress test VGA",
-        icon: "🐒",
-        filename: "furmark.zip",
-        category: "benchmark"
-    },
-    {
-        id: "memtest",
-        name: "MemTest86",
-        description: "Kiểm tra lỗi RAM",
-        icon: "🧠",
-        filename: "memtest86.zip",
-        category: "benchmark"
-    },
-    {
-        id: "hiren",
-        name: "Hiren's Boot CD",
-        description: "Bộ công cụ cứu hộ đa năng",
-        icon: "🛠️",
-        filename: "hirens.iso",
-        category: "rescue"
-    },
-    {
-        id: "winpe",
-        name: "WinPE (Anhdv Boot)",
-        description: "Mini Windows cứu hộ",
-        icon: "💻",
-        filename: "anhdvboot.iso",
-        category: "rescue"
-    }
+    // === BOOT USB ===
+    { id: "rufus", name: "Rufus", description: "Tạo USB Boot cài Windows/Linux", filename: "rufus.exe", category: "boot" },
+    { id: "ventoy", name: "Ventoy", description: "Tạo USB Multi-boot từ ISO", filename: "ventoy.zip", category: "boot" },
+    { id: "etcher", name: "balenaEtcher", description: "Flash OS image vào USB/SD", filename: "etcher.exe", category: "boot" },
+    
+    // === HARDWARE INFO ===
+    { id: "cpuz", name: "CPU-Z", description: "Xem thông tin CPU chi tiết", filename: "cpu-z.zip", category: "info" },
+    { id: "gpuz", name: "GPU-Z", description: "Xem thông tin Card đồ họa", filename: "gpu-z.exe", category: "info" },
+    { id: "hwinfo", name: "HWiNFO", description: "Thông tin phần cứng toàn diện", filename: "hwinfo.zip", category: "info" },
+    { id: "speccy", name: "Speccy", description: "Tổng quan hệ thống đơn giản", filename: "speccy.exe", category: "info" },
+    
+    // === DISK TOOLS ===
+    { id: "crystaldiskinfo", name: "CrystalDiskInfo", description: "Kiểm tra sức khỏe ổ cứng", filename: "crystaldiskinfo.zip", category: "disk" },
+    { id: "crystaldiskmark", name: "CrystalDiskMark", description: "Benchmark tốc độ ổ cứng", filename: "crystaldiskmark.zip", category: "disk" },
+    { id: "minitool", name: "MiniTool Partition", description: "Quản lý phân vùng ổ cứng", filename: "minitool.zip", category: "disk" },
+    { id: "diskgenius", name: "DiskGenius", description: "Khôi phục dữ liệu & phân vùng", filename: "diskgenius.zip", category: "disk" },
+    
+    // === DRIVER ===
+    { id: "ddu", name: "DDU", description: "Gỡ sạch driver VGA", filename: "ddu.zip", category: "driver" },
+    { id: "snappydriver", name: "Snappy Driver", description: "Cài driver offline tự động", filename: "snappy.zip", category: "driver" },
+    { id: "driverbooster", name: "Driver Booster", description: "Cập nhật driver online", filename: "driverbooster.exe", category: "driver" },
+    
+    // === BENCHMARK & STRESS TEST ===
+    { id: "aida64", name: "AIDA64", description: "Stress test & Benchmark toàn diện", filename: "aida64.zip", category: "benchmark" },
+    { id: "furmark", name: "FurMark", description: "Stress test VGA (GPU burn-in)", filename: "furmark.zip", category: "benchmark" },
+    { id: "memtest", name: "MemTest86", description: "Kiểm tra lỗi RAM", filename: "memtest86.zip", category: "benchmark" },
+    { id: "prime95", name: "Prime95", description: "Stress test CPU", filename: "prime95.zip", category: "benchmark" },
+    
+    // === RESCUE & RECOVERY ===
+    { id: "hiren", name: "Hiren's Boot CD", description: "Bộ công cụ cứu hộ đa năng", filename: "hirens.iso", category: "rescue" },
+    { id: "winpe", name: "WinPE (Anhdv Boot)", description: "Mini Windows cứu hộ", filename: "anhdvboot.iso", category: "rescue" },
+    { id: "medicat", name: "Medicat USB", description: "Bộ cứu hộ hiện đại", filename: "medicat.iso", category: "rescue" }
 ];
 
 // ========================================
