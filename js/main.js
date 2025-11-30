@@ -389,9 +389,10 @@ function findSoftwareById(id) {
 }
 
 // ========================================
-// Tab 2: Rescue Tools
+// Tab 2: Tool & Crack
 // ========================================
 const RESCUE_CATEGORIES = {
+    crack: "CR@CK & ACTIVATE",
     boot: "BOOT & CÀI WIN",
     info: "THÔNG TIN PHẦN CỨNG",
     disk: "QUẢN LÝ Ổ CỨNG",
@@ -399,6 +400,7 @@ const RESCUE_CATEGORIES = {
     benchmark: "KIỂM TRA & STRESS TEST",
     rescue: "BỘ CÔNG CỤ CỨU HỘ"
 };
+
 
 function renderRescueTools() {
     // Nhóm tools theo category
@@ -409,12 +411,26 @@ function renderRescueTools() {
         return acc;
     }, {});
     
+    // Build Quick Navigation
+    let navHtml = '<div class="rescue-nav">';
+    for (const catId of Object.keys(RESCUE_CATEGORIES)) {
+        if (grouped[catId]) {
+            const name = RESCUE_CATEGORIES[catId];
+            const count = grouped[catId].length;
+            navHtml += `<a href="#cat-${catId}" class="rescue-nav-item" data-cat="${catId}">
+                <span class="nav-name">${name}</span>
+                <span class="nav-count">${count}</span>
+            </a>`;
+        }
+    }
+    navHtml += '</div>';
+    
     // Render theo từng nhóm
-    let html = '';
+    let html = navHtml + '<div class="rescue-content">';
     for (const [catId, tools] of Object.entries(grouped)) {
         const catName = RESCUE_CATEGORIES[catId] || catId.toUpperCase();
         html += `
-            <div class="rescue-category">
+            <div class="rescue-category" id="cat-${catId}">
                 <h3 class="category-header">${catName}</h3>
                 <div class="rescue-list">
                     ${tools.map(tool => `
@@ -435,8 +451,24 @@ function renderRescueTools() {
             </div>
         `;
     }
+    html += '</div>'; // Close rescue-content
     
     DOM.rescueTools.innerHTML = html;
+    
+    // Add smooth scroll for quick nav
+    document.querySelectorAll('.rescue-nav-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const catId = item.dataset.cat;
+            const target = document.getElementById(`cat-${catId}`);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Highlight active nav
+                document.querySelectorAll('.rescue-nav-item').forEach(n => n.classList.remove('active'));
+                item.classList.add('active');
+            }
+        });
+    });
 }
 
 // ========================================

@@ -13,3 +13,10 @@ Thumbs.db
 
 # Dependencies (if any)
 node_modules/
+# Bỏ qua các file trong thư mục repo (vì nặng quá)
+repo/*.zip
+repo/*.rar
+repo/*.iso
+repo/*.exe
+repo/Altium*
+repo/Proteus*

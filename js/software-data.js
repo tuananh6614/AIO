@@ -38,7 +38,8 @@ const SOFTWARE_DATA = {
                 { id: "Microsoft.Teams", name: "Microsoft Teams", icon: "teams.png" },
                 { id: "Discord.Discord", name: "Discord", icon: "discord.png" },
                 { id: "Telegram.TelegramDesktop", name: "Telegram", icon: "telegram.png" },
-                { id:  "VNGCorp.Zalo", name: "Zalo", icon: "zalo.png"},
+                { id: "VNGCorp.Zalo", name: "Zalo", icon: "zalo.png"},
+
            
             ]
         },
@@ -51,7 +52,8 @@ const SOFTWARE_DATA = {
                 { id: "Spotify.Spotify", name: "Spotify", icon: "spotify.png" },
                 { id: "AIMP.AIMP", name: "AIMP", icon: "aimp.png" },
                 { id: "clsid2.mpc-hc", name: "MPC-HC", icon: "mpchc.png" },
-                { id: "Daum.PotPlayer", name: "PotPlayer", icon: "potplayer.png" }
+                { id: "Daum.PotPlayer", name: "PotPlayer", icon: "potplayer.png" },
+                { id: "HiBitSoftware.HiBitUninstaller", name: "HiBit Uninstaller", icon: "hibit.png"},
             ]
         },
         {
@@ -90,6 +92,7 @@ const SOFTWARE_DATA = {
                 { id: "JetBrains.PyCharm", name: "PyCharm", icon: "pycharm.png"},
             ]
         },
+
         {
             id: "utilities",
             name: "TIỆN ÍCH HỆ THỐNG",
@@ -106,17 +109,7 @@ const SOFTWARE_DATA = {
                 { id: "flux.flux", name: "f.lux", icon: "flux.png" }
             ]
         },
-        {
-            id: "security",
-            name: "BẢO MẬT & ANTIVIRUS",
-            software: [
-                { id: "Malwarebytes.Malwarebytes", name: "Malwarebytes", icon: "malwarebytes.png" },
-                { id: "ESET.NOD32", name: "ESET NOD32", icon: "eset.png" },
-                { id: "Avast.AvastFreeAntivirus", name: "Avast Free", icon: "avast.png" },
-                { id: "ProtonTechnologies.ProtonVPN", name: "ProtonVPN", icon: "protonvpn.png" },
-                { id: "NordVPN.NordVPN", name: "NordVPN", icon: "nordvpn.png" }
-            ]
-        },
+
         {
             id: "runtime",
             name: "RUNTIME & FRAMEWORK",
@@ -136,6 +129,10 @@ const SOFTWARE_DATA = {
 // Lưu ý: Đặt file thật vào thư mục /repo/ với tên khớp filename
 // ========================================
 const RESCUE_TOOLS = [
+    // === CRACK & ACTIVATE ===
+    { id: "altium", name: "Altium Designer", description: "Thiết kế mạch PCB chuyên nghiệp", filename: "Altium Designer 21.3.2.zip", category: "crack" },
+    { id: "proteus", name: "Proteus", description: "Mô phỏng mạch điện tử & vi điều khiển", filename: "Proteus 8.13 Pro Full.zip", category: "crack" },
+    
     // === BOOT USB ===
     { id: "rufus", name: "Rufus", description: "Tạo USB Boot cài Windows/Linux", filename: "rufus.exe", category: "boot" },
     { id: "ventoy", name: "Ventoy", description: "Tạo USB Multi-boot từ ISO", filename: "ventoy.zip", category: "boot" },
@@ -163,7 +160,6 @@ const RESCUE_TOOLS = [
     { id: "furmark", name: "FurMark", description: "Stress test VGA (GPU burn-in)", filename: "furmark.zip", category: "benchmark" },
     { id: "memtest", name: "MemTest86", description: "Kiểm tra lỗi RAM", filename: "memtest86.zip", category: "benchmark" },
     { id: "prime95", name: "Prime95", description: "Stress test CPU", filename: "prime95.zip", category: "benchmark" },
-    
     // === RESCUE & RECOVERY ===
     { id: "hiren", name: "Hiren's Boot CD", description: "Bộ công cụ cứu hộ đa năng", filename: "hirens.iso", category: "rescue" },
     { id: "winpe", name: "WinPE (Anhdv Boot)", description: "Mini Windows cứu hộ", filename: "anhdvboot.iso", category: "rescue" },
@@ -179,7 +175,7 @@ const ONLINE_SERVICES = [
         name: "Stirling PDF",
         description: "Chỉnh sửa PDF online: Nén, ghép, tách, chuyển đổi...",
         icon: "📄",
-        url: "https://pdf.hnaut.id.vn",
+        url: "https://www.photoroom.com/vi/cac-cong-cu/bo-dien-canh",
         color: "#ff6b6b"
     },
     {
