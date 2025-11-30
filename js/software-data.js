@@ -35,10 +35,10 @@ const SOFTWARE_DATA = {
             name: "CHAT & LIÊN LẠC",
             software: [
                 { id: "Zoom.Zoom", name: "Zoom", icon: "zoom.png" },
-                { id: "Microsoft.Teams", name: "Microsoft Teams", icon: "teams.png" },
-                { id: "Discord.Discord", name: "Discord", icon: "discord.png" },
-                { id: "Telegram.TelegramDesktop", name: "Telegram", icon: "telegram.png" },
-                { id: "VNGCorp.Zalo", name: "Zalo", icon: "zalo.png"},
+                { id: "Microsoft.Teams", name: "Microsoft Teams", icon: "icons8-microsoft-team-48.png" },
+                { id: "Discord.Discord", name: "Discord", icon: "icons8-discord-48.png" },
+                { id: "Telegram.TelegramDesktop", name: "Telegram", icon: "icons8-telegram-48.png" },
+                { id: "VNGCorp.Zalo", name: "Zalo", icon: "icons8-zalo-48.png" },
 
            
             ]
@@ -90,6 +90,7 @@ const SOFTWARE_DATA = {
                 { id: "Microsoft.WindowsTerminal", name: "Windows Terminal", icon: "icons8-terminal-48.png" },
                 { id: "ApacheFriends.Xampp.8.2", name: "XAMPP", icon: "xampp.png"},
                 { id: "JetBrains.PyCharm", name: "PyCharm", icon: "pycharm.png"},
+                { id: "Google.AndroidStudio", name: "AndroidStudio",   icon: "AndroidStudio.png"}
             ]
         },
 
@@ -107,6 +108,23 @@ const SOFTWARE_DATA = {
                 { id: "RustDesk.RustDesk", name: "RustDesk", icon: "rustdesk.png" },
                 { id: "Skillbrains.Lightshot", name: "Lightshot", icon: "lightshot.png" },
                 { id: "flux.flux", name: "f.lux", icon: "flux.png" }
+            ]
+        },
+
+        {
+            id: "gaming",
+            name: "GAME",
+            software: [
+                { id: "Valve.Steam", name: "Steam", icon: "steam.png" },
+                { id: "EpicGames.EpicGamesLauncher", name: "Epic Games", icon: "epicgames.png" },
+                { id: "GOG.Galaxy", name: "GOG Galaxy", icon: "gog.png" },
+                { id: "Ubisoft.Connect", name: "Ubisoft Connect", icon: "ubisoft.png" },,
+                { id: "Blizzard.BattleNet", name: "Battle.net", icon: "Battle.png" },
+                { id: "RiotGames.LeagueOfLegends.VN2", name: "League of Legends VN", icon: "lol.png" },
+                { id: "RiotGames.LeagueOfLegends.PBE", name: "League of Legends PBE", icon:"lol.png"},
+                { id: "Overwolf.Overwolf", name: "Overwolf", icon: "overwolf.png" },
+                { id: "Garena.Garena", name: "Garena", icon: "garena.png"}
+
             ]
         },
 
@@ -161,9 +179,9 @@ const RESCUE_TOOLS = [
     { id: "memtest", name: "MemTest86", description: "Kiểm tra lỗi RAM", filename: "memtest86.zip", category: "benchmark" },
     { id: "prime95", name: "Prime95", description: "Stress test CPU", filename: "prime95.zip", category: "benchmark" },
     // === RESCUE & RECOVERY ===
-    { id: "hiren", name: "Hiren's Boot CD", description: "Bộ công cụ cứu hộ đa năng", filename: "hirens.iso", category: "rescue" },
-    { id: "winpe", name: "WinPE (Anhdv Boot)", description: "Mini Windows cứu hộ", filename: "anhdvboot.iso", category: "rescue" },
-    { id: "medicat", name: "Medicat USB", description: "Bộ cứu hộ hiện đại", filename: "medicat.iso", category: "rescue" }
+    { id: "hiren", name: "Boot CD", description: "Bộ công cụ cứu hộ đa năng", filename: "hirens.iso", category: "rescue" },
+    { id: "winpe", name: "WinPE ", description: "Mini Windows cứu hộ", filename: "anhdvboot.iso", category: "rescue" },
+    { id: "medicat", name: "Medicat USB", description: "Bộ cứu hộ ", filename: "medicat.iso", category: "rescue" }
 ];
 
 // ========================================
@@ -180,10 +198,10 @@ const ONLINE_SERVICES = [
     },
     {
         id: "speedtest",
-        name: "LibreSpeed",
+        name: "Speedtest",
         description: "Kiểm tra tốc độ mạng nội bộ & Internet",
         icon: "⚡",
-        url: "https://speedtest.hnaut.id.vn",
+        url: "https://www.speedtest.net/",
         color: "#4ecdc4"
     },
     {

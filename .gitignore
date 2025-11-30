@@ -1,19 +1,11 @@
-# OS
 .DS_Store
 Thumbs.db
-
-# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# Logs
 *.log
-
-# Dependencies (if any)
 node_modules/
-# Bỏ qua các file trong thư mục repo (vì nặng quá)
 repo/*.zip
 repo/*.rar
 repo/*.iso

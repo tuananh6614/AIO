@@ -472,18 +472,19 @@ function renderRescueTools() {
 }
 
 // ========================================
-// Tab 3: Online Services
+// Tab 3: Online Services (Modern Cards)
 // ========================================
 function renderOnlineServices() {
     DOM.onlineServices.innerHTML = ONLINE_SERVICES.map(service => `
-        <div class="online-card">
-            <span class="online-icon">${service.icon}</span>
+        <a href="${service.url}" 
+           target="_blank" 
+           rel="noopener" 
+           class="online-card" 
+           style="--card-color: ${service.color}">
+            <span class="status-badge">Online</span>
             <h3 class="online-name">${service.name}</h3>
             <p class="online-desc">${service.description}</p>
-            <a href="${service.url}" target="_blank" rel="noopener" class="online-link">
-                🔗 Truy cập
-            </a>
-        </div>
+        </a>
     `).join('');
 }
 

@@ -550,63 +550,118 @@ body {
     color: var(--primary);
 }
 
-/* ==================== ONLINE SERVICES ==================== */
+/* ==================== ONLINE SERVICES (Modern Cards) ==================== */
 .online-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
 }
 
 .online-card {
-    padding: 24px;
+    --card-color: var(--primary);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 20px;
     background: var(--bg-white);
     border: 1px solid var(--border-color);
+    border-left: 4px solid var(--card-color);
     border-radius: 8px;
-    text-align: center;
-    transition: var(--transition);
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.25s ease;
+    overflow: hidden;
+}
+
+.online-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(180deg, var(--card-color) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
 }
 
 .online-card:hover {
-    border-color: var(--primary);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-4px);
+    border-color: var(--card-color);
+    box-shadow: 0 12px 24px -8px color-mix(in srgb, var(--card-color) 30%, transparent);
 }
 
-.online-icon {
-    font-size: 2.5rem;
-    margin-bottom: 12px;
-    display: block;
+.online-card:hover::before {
+    opacity: 0.05;
+}
+
+/* Status Badge */
+.status-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: rgba(39, 174, 96, 0.1);
+    border-radius: 10px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #27AE60;
+}
+
+.status-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: #27AE60;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
 }
 
 .online-name {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     color: var(--text-dark);
+    transition: color 0.25s ease;
+}
+
+.online-card:hover .online-name {
+    color: var(--card-color);
 }
 
 .online-desc {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
-    margin-bottom: 16px;
     line-height: 1.4;
+    margin: 0;
 }
 
-.online-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    background: var(--secondary);
-    color: #fff;
-    text-decoration: none;
-    border-radius: 6px;
+/* External link indicator */
+.online-card::after {
+    content: '→';
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
     font-size: 0.9rem;
-    font-weight: 500;
-    transition: var(--transition);
+    color: var(--text-muted);
+    opacity: 0;
+    transform: translate(-4px, 4px);
+    transition: all 0.3s ease;
 }
 
-.online-link:hover {
-    background: var(--secondary-light);
+.online-card:hover::after {
+    opacity: 1;
+    transform: translate(0, 0);
+    color: var(--card-color);
 }
 
 /* ==================== BOTTOM BAR ==================== */
