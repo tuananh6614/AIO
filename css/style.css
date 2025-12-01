@@ -255,10 +255,8 @@ body.dark::-webkit-scrollbar-thumb:hover {
 
 /* Dark mode - Fix icon tối bị mất trên nền tối */
 body.dark .software-icon {
-    background: rgba(255, 255, 255, 0.9);
-    padding: 2px;
-    border-radius: 4px;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+    filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.8)) 
+            drop-shadow(0 0 2px rgba(255, 255, 255, 0.4));
 }
 
 body.dark .software-icon-fallback {
