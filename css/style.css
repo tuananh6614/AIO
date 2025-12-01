@@ -54,6 +54,57 @@ body.theme-online {
     --primary-rgb: 52, 152, 219;
 }
 
+/* ==================== DARK MODE ==================== */
+body.dark {
+    --bg-white: #1f2937;
+    --bg-light: #111827;
+    --bg-gray: #374151;
+    --text-dark: #F9FAFB;
+    --text-body: #E5E7EB;
+    --text-muted: #9CA3AF;
+    --border-color: #4B5563;
+    --border-light: #374151;
+}
+
+body.dark .header {
+    background: #1f2937;
+}
+
+body.dark .category,
+body.dark .result-card,
+body.dark .online-card,
+body.dark .server-select,
+body.dark .search-input {
+    background: #1f2937;
+}
+
+body.dark .software-item {
+    background: #374151;
+}
+
+body.dark .software-item:hover {
+    background: #4B5563;
+}
+
+body.dark .bottom-bar {
+    background: #1f2937;
+}
+
+body.dark .rescue-quick-nav {
+    background: #1f2937;
+}
+
+body.dark .nav-item {
+    background: #374151;
+    color: #E5E7EB;
+}
+
+body.dark .nav-item:hover,
+body.dark .nav-item.active {
+    background: var(--primary);
+    color: white;
+}
+
 /* Reset & Base */
 *, *::before, *::after {
     margin: 0;
@@ -153,6 +204,34 @@ body {
     color: var(--primary);
     border-bottom-color: var(--primary);
 }
+
+/* Theme Toggle Button */
+.theme-toggle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--bg-gray);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    color: var(--text-dark);
+    margin-left: 16px;
+}
+
+.theme-toggle:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: rotate(15deg);
+}
+
+.theme-toggle .icon-moon { display: none; }
+.theme-toggle .icon-sun { display: block; }
+body.dark .theme-toggle .icon-moon { display: block; }
+body.dark .theme-toggle .icon-sun { display: none; }
 
 /* ==================== MAIN CONTENT ==================== */
 .main-content {

@@ -118,7 +118,7 @@ const SOFTWARE_DATA = {
                 { id: "Valve.Steam", name: "Steam", icon: "steam.png" },
                 { id: "EpicGames.EpicGamesLauncher", name: "Epic Games", icon: "epicgames.png" },
                 { id: "GOG.Galaxy", name: "GOG Galaxy", icon: "gog.png" },
-                { id: "Ubisoft.Connect", name: "Ubisoft Connect", icon: "ubisoft.png" },,
+                { id: "Ubisoft.Connect", name: "Ubisoft Connect", icon: "ubisoft.png" },
                 { id: "Blizzard.BattleNet", name: "Battle.net", icon: "Battle.png" },
                 { id: "RiotGames.LeagueOfLegends.VN2", name: "League of Legends VN", icon: "lol.png" },
                 { id: "RiotGames.LeagueOfLegends.PBE", name: "League of Legends PBE", icon:"lol.png"},
@@ -199,10 +199,10 @@ const ONLINE_SERVICES = [
     {
         id: "speedtest",
         name: "Speedtest",
-        description: "Kiểm tra tốc độ mạng nội bộ & Internet",
+        description: "Kiểm tra tốc độ mạng: Ping, Download, Upload",
         icon: "⚡",
-        url: "https://www.speedtest.net/",
-        color: "#4ecdc4"
+        url: "speedtest/index.html",
+        color: "#E67E22"
     },
     {
         id: "ittools",

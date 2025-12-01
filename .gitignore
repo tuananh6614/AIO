@@ -12,3 +12,4 @@ repo/*.iso
 repo/*.exe
 repo/Altium*
 repo/Proteus*
+speedtest/*.bin

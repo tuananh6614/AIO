@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speedtest - AIO</title>
+    <link rel="icon" type="image/x-icon" href="../assets/logo/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="../index.html" class="back-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Quay lai
+    </a>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" title="Doi theme">
+        <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+        <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+    </button>
+
+    <div class="container">
+        <header class="header">
+            <h1>Speed Test</h1>
+            <p id="serverName">Cloudflare (Global)</p>
+        </header>
+
+        <div class="server-select" id="serverSelect">
+            <div class="server-option active" data-server="cloudflare">
+                <span class="server-flag">Global</span>
+            </div>
+            <div class="server-option" data-server="fpt">
+                <span class="server-flag">FPT VN</span>
+            </div>
+            <div class="server-option" data-server="vnpt">
+                <span class="server-flag">VNPT VN</span>
+            </div>
+        </div>
+
+        <div class="gauge-container">
+            <canvas id="gauge" width="240" height="240"></canvas>
+            <div class="gauge-center">
+                <span class="gauge-value" id="gaugeValue">0</span>
+                <span class="gauge-unit">Mbps</span>
+            </div>
+            <div class="gauge-label" id="gaugeLabel">San sang</div>
+        </div>
+
+        <button class="start-btn" id="startBtn">
+            <span class="btn-text">BAT DAU</span>
+        </button>
+
+        <div class="results">
+            <div class="result-card ping">
+                <span class="result-label">PING</span>
+                <span class="result-value" id="pingValue">--</span>
+                <span class="result-unit">ms</span>
+            </div>
+            <div class="result-card download">
+                <span class="result-label">DOWNLOAD</span>
+                <span class="result-value" id="downloadValue">--</span>
+                <span class="result-unit">Mbps</span>
+            </div>
+            <div class="result-card upload">
+                <span class="result-label">UPLOAD</span>
+                <span class="result-value" id="uploadValue">--</span>
+                <span class="result-unit">Mbps</span>
+            </div>
+        </div>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>

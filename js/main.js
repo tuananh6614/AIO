@@ -475,17 +475,18 @@ function renderRescueTools() {
 // Tab 3: Online Services (Modern Cards)
 // ========================================
 function renderOnlineServices() {
-    DOM.onlineServices.innerHTML = ONLINE_SERVICES.map(service => `
+    DOM.onlineServices.innerHTML = ONLINE_SERVICES.map(service => {
+        const isInternal = service.url.startsWith('speedtest/');
+        return `
         <a href="${service.url}" 
-           target="_blank" 
-           rel="noopener" 
+           ${isInternal ? '' : 'target="_blank" rel="noopener"'}
            class="online-card" 
            style="--card-color: ${service.color}">
             <span class="status-badge">Online</span>
             <h3 class="online-name">${service.name}</h3>
             <p class="online-desc">${service.description}</p>
         </a>
-    `).join('');
+    `}).join('');
 }
 
 // ========================================
@@ -510,9 +511,30 @@ function showToast(message) {
 }
 
 // ========================================
+// Dark Mode Toggle
+// ========================================
+function initDarkMode() {
+    const themeToggle = document.getElementById('themeToggle');
+    
+    // Load saved theme or detect system preference
+    const savedTheme = localStorage.getItem('aio-theme');
+    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.body.classList.add('dark');
+    }
+    
+    // Toggle theme on click
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        const isDark = document.body.classList.contains('dark');
+        localStorage.setItem('aio-theme', isDark ? 'dark' : 'light');
+    });
+}
+
+// ========================================
 // Initialize App
 // ========================================
 document.addEventListener('DOMContentLoaded', () => {
+    initDarkMode();
     initTabs();
     renderSoftwareCategories();
     renderRescueTools();
