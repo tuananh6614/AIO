@@ -66,15 +66,15 @@ const State = {
 const THEMES = {
     installer: {
         class: '',
-        logo: 'assets/logo/AIO logo.png'
+        logo: 'assets/logo/AIO-logo.png'
     },
     rescue: {
         class: 'theme-rescue',
-        logo: 'assets/logo/AIO logo2.png'
+        logo: 'assets/logo/AIO-logo2.png'
     },
     online: {
         class: 'theme-online',
-        logo: 'assets/logo/AIO logo3.png'
+        logo: 'assets/logo/AIO-logo3.png'
     }
 };
 
