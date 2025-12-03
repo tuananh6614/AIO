@@ -4,6 +4,26 @@
  */
 
 // ========================================
+// Loading Screen
+// ========================================
+function hideLoadingScreen() {
+    const loadingScreen = document.getElementById('loadingScreen');
+    if (loadingScreen) {
+        loadingScreen.classList.add('hide');
+        // Remove from DOM after animation
+        setTimeout(() => {
+            loadingScreen.remove();
+        }, 500);
+    }
+}
+
+// Hide loading screen when page is fully loaded
+window.addEventListener('load', () => {
+    // Minimum display time for branding (1.5s)
+    setTimeout(hideLoadingScreen, 1500);
+});
+
+// ========================================
 // DOM Elements
 // ========================================
 const DOM = {
@@ -277,32 +297,99 @@ function generateAndDownloadScript() {
     addLine(':: RUNNING AS ADMINISTRATOR');
     addLine(':: ============================================');
     addLine('title AIO - Auto Installer [Administrator]');
-    addLine('mode con: cols=70 lines=30');
-    addLine('color 0A');
+    addLine('mode con: cols=80 lines=40');
     addLine();
+    addLine(':: Setup colors using PowerShell');
+    addLine('for /F "delims=" %%a in (\'powershell -Command "[char]27"\') do set "E=%%a"');
+    addLine();
+    addLine(':: RGB Animation Loading');
+    addLine('for %%c in (196 202 208 214 220 226 190 154 118 82 46 47 48 49 50 51 45 39 33 27 21 57 93 129 165 201 200 199 198 197) do (');
+    addLine('    cls');
+    addLine('    echo.');
+    addLine('    echo.');
+    addLine('    echo.');
+    addLine('    echo.');
+    addLine('    echo   %E%[38;5;%%cm    ###    ####  #######  %E%[0m');
+    addLine('    echo   %E%[38;5;%%cm   ## ##    ##  ##     ## %E%[0m');
+    addLine('    echo   %E%[38;5;%%cm  ##   ##   ##  ##     ## %E%[0m');
+    addLine('    echo   %E%[38;5;%%cm ##     ##  ##  ##     ## %E%[0m');
+    addLine('    echo   %E%[38;5;%%cm #########  ##  ##     ## %E%[0m');
+    addLine('    echo   %E%[38;5;%%cm ##     ##  ##  ##     ## %E%[0m');
+    addLine('    echo   %E%[38;5;%%cm ##     ## ####  #######  %E%[0m');
+    addLine('    echo.');
+    addLine('    echo   %E%[38;5;%%cm        ALL-IN-ONE TOOLKIT%E%[0m');
+    addLine('    echo.');
+    addLine('    echo            %E%[90mDang khoi dong...%E%[0m');
+    addLine('    ping -n 1 -w 50 127.0.0.1 >nul');
+    addLine(')');
+    addLine();
+    addLine('cls');
     addLine('echo.');
-    addLine('echo ============================================================');
-    addLine('echo            AIO - All-In-One Toolkit - Auto Installer');
-    addLine('echo ============================================================');
-    addLine('echo    So luong phan mem: ' + total);
-    addLine('echo    Dang chay voi quyen Administrator');
-    addLine('echo ============================================================');
+    addLine('echo  %E%[38;5;208m    ###    ####  #######  %E%[0m');
+    addLine('echo  %E%[38;5;214m   ## ##    ##  ##     ## %E%[0m');
+    addLine('echo  %E%[38;5;220m  ##   ##   ##  ##     ## %E%[0m');
+    addLine('echo  %E%[38;5;226m ##     ##  ##  ##     ## %E%[0m');
+    addLine('echo  %E%[38;5;220m #########  ##  ##     ## %E%[0m');
+    addLine('echo  %E%[38;5;214m ##     ##  ##  ##     ## %E%[0m');
+    addLine('echo  %E%[38;5;208m ##     ## ####  #######  %E%[0m');
+    addLine('echo.');
+    addLine('echo  %E%[36m===========================================================%E%[0m');
+    addLine('echo  %E%[97m          ALL-IN-ONE TOOLKIT  -  Auto Installer%E%[0m');
+    addLine('echo  %E%[36m===========================================================%E%[0m');
+    addLine('echo.');
+    addLine('echo  %E%[90m  [*] So luong phan mem :%E%[0m %E%[93m' + total + '%E%[0m');
+    addLine('echo  %E%[90m  [*] Quyen             :%E%[0m %E%[92mAdministrator%E%[0m');
+    addLine('echo  %E%[90m  [*] Powered by        :%E%[0m %E%[96mWinget%E%[0m');
+    addLine('echo.');
+    addLine('echo  %E%[36m===========================================================%E%[0m');
     addLine('echo.');
     addLine();
     
-    // Check Winget
+    // Check and Auto-Install Winget
+    addLine('echo  %E%[96m[*]%E%[0m Dang kiem tra Winget...');
     addLine('where winget >nul 2>&1');
     addLine('if %errorlevel% neq 0 (');
-    addLine('    echo [LOI] Winget chua duoc cai dat!');
-    addLine('    echo Vui long cai App Installer tu Microsoft Store.');
-    addLine('    start ms-windows-store://pdp/?productid=9NBLGGH4NNS1');
-    addLine('    pause');
-    addLine('    exit /b 1');
+    addLine('    echo  %E%[93m[!]%E%[0m Winget chua duoc cai dat!');
+    addLine('    echo  %E%[96m[*]%E%[0m Dang tu dong cai dat Winget...');
+    addLine('    echo.');
+    addLine('    ');
+    addLine('    :: Download and install Winget from GitHub');
+    addLine('    set "WINGET_URL=https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle"');
+    addLine('    set "WINGET_FILE=%TEMP%\\WingetInstaller.msixbundle"');
+    addLine('    ');
+    addLine('    echo  %E%[96m[*]%E%[0m Dang tai Winget tu GitHub...');
+    addLine('    powershell -Command "Invoke-WebRequest -Uri \'%WINGET_URL%\' -OutFile \'%WINGET_FILE%\'"');
+    addLine('    if not exist "%WINGET_FILE%" (');
+    addLine('        echo  %E%[91m[X]%E%[0m Khong the tai Winget! Vui long kiem tra ket noi mang.');
+    addLine('        echo  %E%[96m[*]%E%[0m Thu cai thu cong tu Microsoft Store...');
+    addLine('        start ms-windows-store://pdp/?productid=9NBLGGH4NNS1');
+    addLine('        pause');
+    addLine('        exit /b 1');
+    addLine('    )');
+    addLine('    ');
+    addLine('    echo  %E%[96m[*]%E%[0m Dang cai dat Winget...');
+    addLine('    powershell -Command "Add-AppxPackage -Path \'%WINGET_FILE%\'"');
+    addLine('    del "%WINGET_FILE%" >nul 2>&1');
+    addLine('    ');
+    addLine('    :: Verify installation');
+    addLine('    timeout /t 3 >nul');
+    addLine('    where winget >nul 2>&1');
+    addLine('    if %errorlevel% neq 0 (');
+    addLine('        echo  %E%[91m[X]%E%[0m Cai dat Winget that bai!');
+    addLine('        echo  %E%[96m[*]%E%[0m Vui long cai thu cong tu Microsoft Store.');
+    addLine('        start ms-windows-store://pdp/?productid=9NBLGGH4NNS1');
+    addLine('        pause');
+    addLine('        exit /b 1');
+    addLine('    )');
+    addLine('    echo  %E%[92m[OK]%E%[0m Winget da duoc cai dat thanh cong!');
+    addLine('    echo.');
     addLine(')');
+    addLine('echo  %E%[92m[OK]%E%[0m Winget san sang!');
+    addLine('echo.');
     addLine();
     
     // Init counters
-    addLine('echo [INFO] Bat dau cai dat ' + total + ' phan mem...');
+    addLine('echo  %E%[96m[*]%E%[0m Bat dau cai dat %E%[93m' + total + '%E%[0m phan mem...');
     addLine('echo.');
     addLine('set /a total=' + total);
     addLine('set /a current=0');
@@ -319,30 +406,35 @@ function generateAndDownloadScript() {
         
         addLine('set /a current+=1');
         addLine('echo.');
-        addLine('echo ------------------------------------------------------------');
-        addLine('echo [%current%/%total%] Dang cai dat: ' + safeName);
-        addLine('echo ------------------------------------------------------------');
+        addLine('echo  %E%[36m-----------------------------------------------------------%E%[0m');
+        addLine('echo  %E%[97m[!current!/!total!]%E%[0m %E%[38;5;208m' + safeName + '%E%[0m');
+        addLine('echo  %E%[36m-----------------------------------------------------------%E%[0m');
         addLine('winget install -e --id ' + id + ' --force --accept-package-agreements --accept-source-agreements');
-        addLine('if %errorlevel% equ 0 (');
-        addLine('    echo [OK] ' + safeName + ' - Thanh cong!');
+        addLine('if !errorlevel! equ 0 (');
+        addLine('    echo  %E%[92m[OK]%E%[0m ' + safeName + ' - Thanh cong!');
         addLine('    set /a success+=1');
         addLine(') else (');
-        addLine('    echo [SKIP] ' + safeName + ' - Da co hoac loi');
+        addLine('    echo  %E%[93m[~]%E%[0m ' + safeName + ' - Da co hoac loi');
         addLine('    set /a failed+=1');
         addLine(')');
         addLine();
     });
     
-    // Summary
+    // Summary with nice box
     addLine('echo.');
-    addLine('echo ============================================================');
-    addLine('echo                    HOAN TAT CAI DAT');
-    addLine('echo ============================================================');
-    addLine('echo    Thanh cong: %success% / %total%');
-    addLine('echo    That bai: %failed% / %total%');
-    addLine('echo ============================================================');
+    addLine('echo  %E%[36m===========================================================%E%[0m');
     addLine('echo.');
-    addLine('echo Nhan phim bat ky de dong...');
+    addLine('echo  %E%[38;5;208m    ###    ####  #######  %E%[0m');
+    addLine('echo  %E%[38;5;214m   ## ##    ##  ##     ## %E%[0m   %E%[97mHOAN TAT CAI DAT!%E%[0m');
+    addLine('echo  %E%[38;5;220m  ##   ##   ##  ##     ## %E%[0m');
+    addLine('echo  %E%[38;5;226m ##     ##  ##  ##     ## %E%[0m   %E%[92mThanh cong:%E%[0m %E%[92m!success!%E%[0m / %E%[93m!total!%E%[0m');
+    addLine('echo  %E%[38;5;220m #########  ##  ##     ## %E%[0m   %E%[91mThat bai:%E%[0m  %E%[91m!failed!%E%[0m / %E%[93m!total!%E%[0m');
+    addLine('echo  %E%[38;5;214m ##     ##  ##  ##     ## %E%[0m');
+    addLine('echo  %E%[38;5;208m ##     ## ####  #######  %E%[0m');
+    addLine('echo.');
+    addLine('echo  %E%[36m===========================================================%E%[0m');
+    addLine('echo.');
+    addLine('echo  %E%[90mNhan phim bat ky de dong...%E%[0m');
     addLine('pause >nul');
     
     // Download as ASCII/ANSI (no BOM, no UTF-8)
