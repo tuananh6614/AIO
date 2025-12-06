@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIO - All-In-One Toolkit</title>
     <link rel="icon" type="image/x-icon" href="assets/logo/favicon.ico">
-    <link rel="stylesheet" href="css/style.css?v=13">
+    <link rel="stylesheet" href="css/style.css?v=14">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -55,52 +55,42 @@
         <section class="tab-content active" id="installer">
             <div class="container">
 
-                <!-- Search Bar -->
-                <div class="search-wrapper">
-                    <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm phần mềm...">
-                    <button class="search-clear" id="clearSearch">×</button>
+                <!-- Smart Universal Search -->
+                <div class="smart-search-container">
+                    <div class="search-wrapper">
+                        <div class="search-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                            </svg>
+                        </div>
+                        <input type="text" id="searchInput" class="search-input" 
+                               placeholder="Tìm phần mềm trong danh sách hoặc từ kho Winget...">
+                        <div class="search-loading" id="searchLoading">
+                            <div class="spinner"></div>
+                        </div>
+                        <button class="search-clear" id="clearSearch">×</button>
+                    </div>
+                    
+                    <!-- Online Search Results Dropdown -->
+                    <div class="online-results-dropdown" id="onlineResultsDropdown">
+                        <div class="online-results-header">
+                            <span class="online-badge">🌐 Kết quả từ Winget</span>
+                            <span class="online-hint">Ấn Enter để tìm online</span>
+                        </div>
+                        <div class="online-results-list" id="onlineResultsList">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+                    
+                    <!-- Selected Custom Apps Tags -->
+                    <div class="selected-tags-container" id="selectedTagsContainer">
+                        <!-- Tags will be added here -->
+                    </div>
                 </div>
 
                 <!-- Software Grid -->
                 <div class="software-grid" id="softwareCategories">
                     <!-- Dynamically generated -->
-                </div>
-
-                <!-- Advanced Custom Install Section -->
-                <div class="advanced-install-section">
-                    <div class="advanced-install-header">
-                        <span class="advanced-icon">🔍</span>
-                        <div class="advanced-text">
-                            <h3>Không thấy phần mềm bạn cần?</h3>
-                            <p>Tìm và thêm bất kỳ phần mềm nào từ kho Winget</p>
-                        </div>
-                    </div>
-                    
-                    <div class="advanced-install-body">
-                        <!-- Tags Container with Input -->
-                        <div class="tags-input-container" id="tagsInputContainer">
-                            <div class="tags-list" id="tagsList">
-                                <!-- Tags will be added here dynamically -->
-                            </div>
-                            <input type="text" id="wingetSearchInput" class="tags-input" 
-                                   placeholder="Nhập tên hoặc ID phần mềm...">
-                            <div class="tags-input-icon">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                                </svg>
-                            </div>
-                            <div class="winget-loading" id="wingetLoading">
-                                <div class="spinner"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Search Results Dropdown -->
-                        <div class="winget-results" id="wingetResults">
-                            <!-- Dynamically populated -->
-                        </div>
-                        
-                        <p class="advanced-hint">💡 Gõ tên → Chọn từ gợi ý | Hoặc gõ ID rồi ấn <kbd>Enter</kbd> hoặc <kbd>,</kbd></p>
-                    </div>
                 </div>
             </div>
         </section>
@@ -159,7 +149,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/software-data.js?v=13"></script>
-    <script src="js/main.js?v=13"></script>
+    <script src="js/software-data.js?v=14"></script>
+    <script src="js/main.js?v=14"></script>
 </body>
 </html>

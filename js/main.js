@@ -250,124 +250,104 @@ function addSoftwareItemListeners() {
     });
 }
 
-// Search
-function initSearch() {
-    DOM.searchInput.addEventListener('input', (e) => {
-        filterSoftware(e.target.value.toLowerCase().trim());
-    });
-    
-    DOM.clearSearch.addEventListener('click', () => {
-        DOM.searchInput.value = '';
-        filterSoftware('');
-        DOM.searchInput.focus();
-    });
-}
-
-function filterSoftware(query) {
-    document.querySelectorAll('.software-item').forEach(item => {
-        const name = item.dataset.name;
-        const id = item.dataset.id.toLowerCase();
-        item.classList.toggle('hidden', !name.includes(query) && !id.includes(query));
-    });
-    
-    // Hide empty categories
-    document.querySelectorAll('.category').forEach(category => {
-        const visible = category.querySelectorAll('.software-item:not(.hidden)').length;
-        category.style.display = visible === 0 ? 'none' : '';
-    });
-}
-
-// Action buttons
-function initActionButtons() {
-    DOM.deselectAll.addEventListener('click', () => {
-        State.clearAll();
-        showToast('Đã bỏ chọn tất cả');
-    });
-    
-    DOM.downloadScript.addEventListener('click', () => {
-        if (State.getTotalCount() > 0) {
-            generateAndDownloadScript();
-        } else {
-            showToast('Vui long chon phan mem hoac nhap Custom ID!');
-        }
-    });
-}
-
 // ========================================
-// Tags Input System (Winget Search + Manual Input)
+// Smart Universal Search
 // ========================================
-const TagsInput = {
+const SmartSearch = {
     searchInput: null,
-    tagsList: null,
-    resultsContainer: null,
+    clearBtn: null,
+    dropdown: null,
+    resultsList: null,
+    tagsContainer: null,
     loadingIndicator: null,
     debounceTimer: null,
+    lastQuery: '',
     
     init() {
-        this.searchInput = document.getElementById('wingetSearchInput');
-        this.tagsList = document.getElementById('tagsList');
-        this.resultsContainer = document.getElementById('wingetResults');
-        this.loadingIndicator = document.getElementById('wingetLoading');
+        this.searchInput = document.getElementById('searchInput');
+        this.clearBtn = document.getElementById('clearSearch');
+        this.dropdown = document.getElementById('onlineResultsDropdown');
+        this.resultsList = document.getElementById('onlineResultsList');
+        this.tagsContainer = document.getElementById('selectedTagsContainer');
+        this.loadingIndicator = document.getElementById('searchLoading');
         
         if (!this.searchInput) return;
         
-        // Click on container focuses input
-        const container = document.getElementById('tagsInputContainer');
-        if (container) {
-            container.addEventListener('click', () => this.searchInput.focus());
-        }
-        
-        // Input event with debounce for API search
+        // Input event - Local filter + Online search preparation
         this.searchInput.addEventListener('input', (e) => {
             const query = e.target.value.trim();
+            this.lastQuery = query;
+            
+            // Always filter local first
+            this.filterLocal(query);
+            
+            // Clear timer and hide dropdown
             clearTimeout(this.debounceTimer);
             
             if (query.length < 2) {
-                this.hideResults();
+                this.hideDropdown();
                 return;
             }
             
-            this.debounceTimer = setTimeout(() => {
-                this.search(query);
-            }, 300);
+            // Show hint in dropdown header
+            this.updateHint(true);
         });
         
-        // Keyboard events: Enter and Comma to add manual ID
+        // Enter key triggers online search
         this.searchInput.addEventListener('keydown', (e) => {
-            const value = this.searchInput.value.trim();
-            
-            // Enter or Comma to add
-            if ((e.key === 'Enter' || e.key === ',') && value.length > 0) {
+            if (e.key === 'Enter' && this.lastQuery.length >= 2) {
                 e.preventDefault();
-                // Remove trailing comma if any
-                const cleanValue = value.replace(/,+$/, '').trim();
-                if (cleanValue) {
-                    this.addTag(cleanValue, cleanValue);
-                    this.searchInput.value = '';
-                    this.hideResults();
-                }
-            }
-            
-            // Backspace to remove last tag when input is empty
-            if (e.key === 'Backspace' && value === '' && State.customIds.length > 0) {
-                const lastItem = State.customIds[State.customIds.length - 1];
-                this.removeTag(lastItem.id);
+                this.searchOnline(this.lastQuery);
             }
         });
         
-        // Hide results when clicking outside
+        // Clear button
+        this.clearBtn.addEventListener('click', () => {
+            this.searchInput.value = '';
+            this.lastQuery = '';
+            this.filterLocal('');
+            this.hideDropdown();
+            this.searchInput.focus();
+        });
+        
+        // Hide dropdown when clicking outside
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.advanced-install-body')) {
-                this.hideResults();
+            if (!e.target.closest('.smart-search-container')) {
+                this.hideDropdown();
             }
         });
+        
+        // Render initial tags if any
+        this.renderTags();
     },
     
-    async search(query) {
+    filterLocal(query) {
+        const lowerQuery = query.toLowerCase();
+        let visibleCount = 0;
+        
+        document.querySelectorAll('.software-item').forEach(item => {
+            const name = item.dataset.name;
+            const id = item.dataset.id.toLowerCase();
+            const isVisible = !query || name.includes(lowerQuery) || id.includes(lowerQuery);
+            item.classList.toggle('hidden', !isVisible);
+            if (isVisible) visibleCount++;
+        });
+        
+        // Hide empty categories
+        document.querySelectorAll('.category').forEach(category => {
+            const visible = category.querySelectorAll('.software-item:not(.hidden)').length;
+            category.style.display = visible === 0 ? 'none' : '';
+        });
+        
+        return visibleCount;
+    },
+    
+    async searchOnline(query) {
         this.showLoading(true);
+        this.updateHint(false);
         
         try {
-            const apiUrl = `https://api.winget.run/v2/packages?query=${encodeURIComponent(query)}&take=8`;
+            const apiUrl = `https://api.winget.run/v2/packages?query=${encodeURIComponent(query)}&take=10`;
             const response = await fetch(apiUrl);
             const data = await response.json();
             
@@ -377,113 +357,141 @@ const TagsInput = {
                 const packages = data.Packages.map(pkg => ({
                     id: pkg.Id || '',
                     name: pkg.Name || pkg.Id || 'Unknown',
-                    publisher: pkg.Publisher || ''
+                    publisher: pkg.Publisher || '',
+                    version: pkg.Latest?.Version || ''
                 }));
-                this.renderResults(packages);
+                this.renderOnlineResults(packages);
             } else {
                 this.renderNoResults(query);
             }
         } catch (error) {
-            console.error('Winget search error:', error);
+            console.error('Online search error:', error);
             this.showLoading(false);
             this.renderError();
         }
     },
     
-    renderResults(packages) {
-        this.resultsContainer.innerHTML = packages.map(pkg => `
-            <div class="winget-result-item" data-id="${pkg.id}" data-name="${pkg.name}">
-                <div class="winget-result-icon">${pkg.name.charAt(0).toUpperCase()}</div>
-                <div class="winget-result-info">
-                    <div class="winget-result-name">${pkg.name}</div>
-                    <div class="winget-result-id">${pkg.id}</div>
-                    ${pkg.publisher ? `<div class="winget-result-publisher">by ${pkg.publisher}</div>` : ''}
+    renderOnlineResults(packages) {
+        this.resultsList.innerHTML = packages.map(pkg => `
+            <div class="online-result-item" data-id="${pkg.id}" data-name="${pkg.name}">
+                <div class="online-result-icon">${pkg.name.charAt(0).toUpperCase()}</div>
+                <div class="online-result-info">
+                    <div class="online-result-name">${pkg.name}</div>
+                    <span class="online-result-id">${pkg.id}</span>
+                    ${pkg.version ? `<span class="online-result-version">v${pkg.version}</span>` : ''}
                 </div>
-                <div class="winget-result-add">+</div>
+                <div class="online-result-add">+</div>
             </div>
         `).join('');
         
         // Click handlers
-        this.resultsContainer.querySelectorAll('.winget-result-item').forEach(item => {
+        this.resultsList.querySelectorAll('.online-result-item').forEach(item => {
             item.addEventListener('click', () => {
-                this.addTag(item.dataset.id, item.dataset.name);
-                this.searchInput.value = '';
-                this.hideResults();
+                this.addCustomApp(item.dataset.id, item.dataset.name);
             });
         });
         
-        this.resultsContainer.classList.add('show');
+        this.showDropdown();
     },
     
     renderNoResults(query) {
-        this.resultsContainer.innerHTML = `
-            <div class="winget-no-results">
-                <p>Không tìm thấy "<strong>${query}</strong>"</p>
-                <p style="font-size: 0.8rem; margin-top: 8px;">
-                    Ấn <kbd>Enter</kbd> để thêm "<strong>${query}</strong>" như ID thủ công
+        this.resultsList.innerHTML = `
+            <div class="online-no-results">
+                <p>😔 Không tìm thấy "<strong>${query}</strong>" trên Winget</p>
+                <p style="font-size: 0.85rem; margin-top: 8px;">
+                    Thử từ khóa khác hoặc tìm tại 
+                    <a href="https://winget.run/search?query=${encodeURIComponent(query)}" target="_blank" style="color: var(--primary);">winget.run</a>
                 </p>
             </div>
         `;
-        this.resultsContainer.classList.add('show');
+        this.showDropdown();
     },
     
     renderError() {
-        this.resultsContainer.innerHTML = `
-            <div class="winget-no-results">
-                <p>⚠️ Lỗi kết nối API</p>
-                <p style="font-size: 0.8rem;">Bạn có thể gõ ID thủ công và ấn Enter</p>
+        this.resultsList.innerHTML = `
+            <div class="online-no-results">
+                <p>⚠️ Lỗi kết nối</p>
+                <p style="font-size: 0.85rem;">Vui lòng thử lại sau</p>
             </div>
         `;
-        this.resultsContainer.classList.add('show');
+        this.showDropdown();
     },
     
-    hideResults() {
-        this.resultsContainer.classList.remove('show');
+    addCustomApp(id, name) {
+        if (!State.addCustomId(id, name)) {
+            showToast('Đã có trong danh sách!');
+            return;
+        }
+        
+        this.renderTags();
+        this.searchInput.value = '';
+        this.lastQuery = '';
+        this.filterLocal('');
+        this.hideDropdown();
+        showToast(`✅ Đã thêm: ${name}`);
+    },
+    
+    removeCustomApp(id) {
+        State.removeCustomId(id);
+        this.renderTags();
+    },
+    
+    renderTags() {
+        if (!this.tagsContainer) return;
+        
+        this.tagsContainer.innerHTML = State.customIds.map(item => `
+            <div class="custom-tag" data-id="${item.id}">
+                <span class="tag-name">${item.name}</span>
+                <button type="button" class="tag-remove" title="Xóa">×</button>
+            </div>
+        `).join('');
+        
+        // Add remove handlers
+        this.tagsContainer.querySelectorAll('.tag-remove').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const tag = e.target.closest('.custom-tag');
+                this.removeCustomApp(tag.dataset.id);
+            });
+        });
+    },
+    
+    showDropdown() {
+        this.dropdown.classList.add('show');
+    },
+    
+    hideDropdown() {
+        this.dropdown.classList.remove('show');
     },
     
     showLoading(show) {
         this.loadingIndicator.classList.toggle('show', show);
     },
     
-    addTag(id, name) {
-        if (!State.addCustomId(id, name)) {
-            showToast('Đã có trong danh sách!');
-            return;
+    updateHint(showEnterHint) {
+        const hint = this.dropdown.querySelector('.online-hint');
+        if (hint) {
+            hint.textContent = showEnterHint ? 'Ấn Enter để tìm online' : 'Đang tìm...';
         }
-        this.renderTags();
-        showToast(`Đã thêm: ${name}`);
-    },
-    
-    removeTag(id) {
-        State.removeCustomId(id);
-        this.renderTags();
-    },
-    
-    renderTags() {
-        if (!this.tagsList) return;
-        
-        this.tagsList.innerHTML = State.customIds.map(item => `
-            <div class="tag-item" data-id="${item.id}">
-                <span class="tag-name">${item.name}</span>
-                <button type="button" class="tag-close" title="Xóa">×</button>
-            </div>
-        `).join('');
-        
-        // Add remove handlers
-        this.tagsList.querySelectorAll('.tag-close').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const tag = e.target.closest('.tag-item');
-                this.removeTag(tag.dataset.id);
-            });
-        });
-        
-        // Update placeholder
-        this.searchInput.placeholder = State.customIds.length > 0 
-            ? 'Thêm phần mềm khác...' 
-            : 'Nhập tên hoặc ID phần mềm...';
     }
 };
+
+// Action buttons
+function initActionButtons() {
+    DOM.deselectAll.addEventListener('click', () => {
+        State.clearAll();
+        SmartSearch.renderTags();
+        showToast('Đã bỏ chọn tất cả');
+    });
+    
+    DOM.downloadScript.addEventListener('click', () => {
+        if (State.getTotalCount() > 0) {
+            generateAndDownloadScript();
+        } else {
+            showToast('Vui lòng chọn phần mềm hoặc tìm thêm từ Winget!');
+        }
+    });
+}
 
 // Generate .bat script - Pure ASCII for CMD compatibility
 function generateAndDownloadScript() {
@@ -702,7 +710,7 @@ function generateAndDownloadScript() {
     
     // Clear custom IDs after download
     State.customIds = [];
-    TagsInput.renderTags();
+    SmartSearch.renderTags();
 }
 
 // Download .bat file - Manual byte encoding for CRLF
@@ -894,8 +902,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderSoftwareCategories();
     renderRescueTools();
     renderOnlineServices();
-    initSearch();
+    SmartSearch.init();
     initActionButtons();
-    TagsInput.init();
     State.updateUI();
 });
