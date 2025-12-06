@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIO - All-In-One Toolkit</title>
     <link rel="icon" type="image/x-icon" href="assets/logo/favicon.ico">
-    <link rel="stylesheet" href="css/style.css?v=12">
+    <link rel="stylesheet" href="css/style.css?v=13">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -77,11 +77,15 @@
                     </div>
                     
                     <div class="advanced-install-body">
-                        <div class="winget-search-wrapper">
-                            <input type="text" id="wingetSearchInput" class="winget-search-input" 
-                                   placeholder="Nhập tên phần mềm (VD: Valorant, CapCut, Spotify...)">
-                            <div class="winget-search-icon">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <!-- Tags Container with Input -->
+                        <div class="tags-input-container" id="tagsInputContainer">
+                            <div class="tags-list" id="tagsList">
+                                <!-- Tags will be added here dynamically -->
+                            </div>
+                            <input type="text" id="wingetSearchInput" class="tags-input" 
+                                   placeholder="Nhập tên hoặc ID phần mềm...">
+                            <div class="tags-input-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
                                 </svg>
                             </div>
@@ -95,12 +99,7 @@
                             <!-- Dynamically populated -->
                         </div>
                         
-                        <!-- Selected Custom IDs -->
-                        <div class="selected-custom-ids" id="selectedCustomIds">
-                            <input type="hidden" id="customWingetIds" value="">
-                        </div>
-                        
-                        <p class="advanced-hint">💡 Gõ tên phần mềm → Chọn từ gợi ý → ID sẽ tự động thêm vào danh sách cài đặt</p>
+                        <p class="advanced-hint">💡 Gõ tên → Chọn từ gợi ý | Hoặc gõ ID rồi ấn <kbd>Enter</kbd> hoặc <kbd>,</kbd></p>
                     </div>
                 </div>
             </div>
@@ -160,7 +159,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/software-data.js?v=11"></script>
-    <script src="js/main.js?v=11"></script>
+    <script src="js/software-data.js?v=13"></script>
+    <script src="js/main.js?v=13"></script>
 </body>
 </html>

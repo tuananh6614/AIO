@@ -47,6 +47,7 @@ const DOM = {
 // ========================================
 const State = {
     selectedSoftware: new Set(),
+    customIds: [], // Array of {id, name} for custom Winget IDs
     
     toggle(id) {
         if (this.selectedSoftware.has(id)) {
@@ -57,13 +58,36 @@ const State = {
         this.updateUI();
     },
     
-    clearAll() {
-        this.selectedSoftware.clear();
+    addCustomId(id, name = null) {
+        // Prevent duplicates
+        if (this.customIds.some(item => item.id === id)) {
+            return false;
+        }
+        this.customIds.push({ id, name: name || id });
+        this.updateUI();
+        return true;
+    },
+    
+    removeCustomId(id) {
+        this.customIds = this.customIds.filter(item => item.id !== id);
         this.updateUI();
     },
     
+    clearAll() {
+        this.selectedSoftware.clear();
+        this.customIds = [];
+        this.updateUI();
+        // Also clear tags UI
+        const tagsList = document.getElementById('tagsList');
+        if (tagsList) tagsList.innerHTML = '';
+    },
+    
+    getTotalCount() {
+        return this.selectedSoftware.size + this.customIds.length;
+    },
+    
     updateUI() {
-        const count = this.selectedSoftware.size;
+        const count = this.getTotalCount();
         DOM.selectedCount.textContent = count;
         
         // Update items
@@ -74,7 +98,7 @@ const State = {
             checkbox.checked = isSelected;
         });
         
-        // Show/hide bottom bar
+        // Show/hide bottom bar (show if any software selected OR custom IDs added)
         DOM.bottomBar.classList.toggle('visible', count > 0);
         DOM.downloadScript.disabled = count === 0;
     }
@@ -261,11 +285,7 @@ function initActionButtons() {
     });
     
     DOM.downloadScript.addEventListener('click', () => {
-        const customInput = document.getElementById('customWingetIds');
-        const hasCustomIds = customInput && customInput.value.trim().length > 0;
-        const hasSelectedSoftware = State.selectedSoftware.size > 0;
-        
-        if (hasSelectedSoftware || hasCustomIds) {
+        if (State.getTotalCount() > 0) {
             generateAndDownloadScript();
         } else {
             showToast('Vui long chon phan mem hoac nhap Custom ID!');
@@ -274,30 +294,32 @@ function initActionButtons() {
 }
 
 // ========================================
-// Advanced Winget Search (with Debounce & AJAX)
+// Tags Input System (Winget Search + Manual Input)
 // ========================================
-const WingetSearch = {
+const TagsInput = {
     searchInput: null,
+    tagsList: null,
     resultsContainer: null,
     loadingIndicator: null,
-    selectedContainer: null,
-    hiddenInput: null,
     debounceTimer: null,
-    selectedApps: [], // Array of {id, name}
     
     init() {
         this.searchInput = document.getElementById('wingetSearchInput');
+        this.tagsList = document.getElementById('tagsList');
         this.resultsContainer = document.getElementById('wingetResults');
         this.loadingIndicator = document.getElementById('wingetLoading');
-        this.selectedContainer = document.getElementById('selectedCustomIds');
-        this.hiddenInput = document.getElementById('customWingetIds');
         
         if (!this.searchInput) return;
         
-        // Input event with debounce
+        // Click on container focuses input
+        const container = document.getElementById('tagsInputContainer');
+        if (container) {
+            container.addEventListener('click', () => this.searchInput.focus());
+        }
+        
+        // Input event with debounce for API search
         this.searchInput.addEventListener('input', (e) => {
             const query = e.target.value.trim();
-            
             clearTimeout(this.debounceTimer);
             
             if (query.length < 2) {
@@ -310,17 +332,33 @@ const WingetSearch = {
             }, 300);
         });
         
+        // Keyboard events: Enter and Comma to add manual ID
+        this.searchInput.addEventListener('keydown', (e) => {
+            const value = this.searchInput.value.trim();
+            
+            // Enter or Comma to add
+            if ((e.key === 'Enter' || e.key === ',') && value.length > 0) {
+                e.preventDefault();
+                // Remove trailing comma if any
+                const cleanValue = value.replace(/,+$/, '').trim();
+                if (cleanValue) {
+                    this.addTag(cleanValue, cleanValue);
+                    this.searchInput.value = '';
+                    this.hideResults();
+                }
+            }
+            
+            // Backspace to remove last tag when input is empty
+            if (e.key === 'Backspace' && value === '' && State.customIds.length > 0) {
+                const lastItem = State.customIds[State.customIds.length - 1];
+                this.removeTag(lastItem.id);
+            }
+        });
+        
         // Hide results when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.advanced-install-body')) {
                 this.hideResults();
-            }
-        });
-        
-        // Focus shows results if available
-        this.searchInput.addEventListener('focus', () => {
-            if (this.resultsContainer.children.length > 0) {
-                this.resultsContainer.classList.add('show');
             }
         });
     },
@@ -329,7 +367,6 @@ const WingetSearch = {
         this.showLoading(true);
         
         try {
-            // Direct API call to winget.run (CORS enabled)
             const apiUrl = `https://api.winget.run/v2/packages?query=${encodeURIComponent(query)}&take=8`;
             const response = await fetch(apiUrl);
             const data = await response.json();
@@ -337,12 +374,10 @@ const WingetSearch = {
             this.showLoading(false);
             
             if (data && data.Packages && data.Packages.length > 0) {
-                // Transform API response
                 const packages = data.Packages.map(pkg => ({
                     id: pkg.Id || '',
                     name: pkg.Name || pkg.Id || 'Unknown',
-                    publisher: pkg.Publisher || '',
-                    version: pkg.Latest?.Version || ''
+                    publisher: pkg.Publisher || ''
                 }));
                 this.renderResults(packages);
             } else {
@@ -368,12 +403,12 @@ const WingetSearch = {
             </div>
         `).join('');
         
-        // Add click handlers
+        // Click handlers
         this.resultsContainer.querySelectorAll('.winget-result-item').forEach(item => {
             item.addEventListener('click', () => {
-                const id = item.dataset.id;
-                const name = item.dataset.name;
-                this.addApp(id, name);
+                this.addTag(item.dataset.id, item.dataset.name);
+                this.searchInput.value = '';
+                this.hideResults();
             });
         });
         
@@ -384,7 +419,9 @@ const WingetSearch = {
         this.resultsContainer.innerHTML = `
             <div class="winget-no-results">
                 <p>Không tìm thấy "<strong>${query}</strong>"</p>
-                <p style="font-size: 0.8rem; margin-top: 8px;">Thử từ khóa khác hoặc tìm tại <a href="https://winget.run/search?query=${encodeURIComponent(query)}" target="_blank" style="color: var(--primary);">winget.run</a></p>
+                <p style="font-size: 0.8rem; margin-top: 8px;">
+                    Ấn <kbd>Enter</kbd> để thêm "<strong>${query}</strong>" như ID thủ công
+                </p>
             </div>
         `;
         this.resultsContainer.classList.add('show');
@@ -393,8 +430,8 @@ const WingetSearch = {
     renderError() {
         this.resultsContainer.innerHTML = `
             <div class="winget-no-results">
-                <p>⚠️ Lỗi kết nối</p>
-                <p style="font-size: 0.8rem;">Vui lòng thử lại sau</p>
+                <p>⚠️ Lỗi kết nối API</p>
+                <p style="font-size: 0.8rem;">Bạn có thể gõ ID thủ công và ấn Enter</p>
             </div>
         `;
         this.resultsContainer.classList.add('show');
@@ -405,83 +442,46 @@ const WingetSearch = {
     },
     
     showLoading(show) {
-        if (show) {
-            this.loadingIndicator.classList.add('show');
-        } else {
-            this.loadingIndicator.classList.remove('show');
-        }
+        this.loadingIndicator.classList.toggle('show', show);
     },
     
-    addApp(id, name) {
-        // Check if already added
-        if (this.selectedApps.some(app => app.id === id)) {
+    addTag(id, name) {
+        if (!State.addCustomId(id, name)) {
             showToast('Đã có trong danh sách!');
             return;
         }
-        
-        // Add to array
-        this.selectedApps.push({ id, name });
-        
-        // Update hidden input
-        this.updateHiddenInput();
-        
-        // Render tag
-        this.renderSelectedTags();
-        
-        // Clear search input and hide results
-        this.searchInput.value = '';
-        this.hideResults();
-        
+        this.renderTags();
         showToast(`Đã thêm: ${name}`);
     },
     
-    removeApp(id) {
-        this.selectedApps = this.selectedApps.filter(app => app.id !== id);
-        this.updateHiddenInput();
-        this.renderSelectedTags();
+    removeTag(id) {
+        State.removeCustomId(id);
+        this.renderTags();
     },
     
-    updateHiddenInput() {
-        this.hiddenInput.value = this.selectedApps.map(app => app.id).join(',');
-    },
-    
-    renderSelectedTags() {
-        const tagsHtml = this.selectedApps.map(app => `
-            <div class="custom-id-tag" data-id="${app.id}">
-                <span class="tag-name">${app.name}</span>
-                <button type="button" class="tag-remove" title="Xóa">×</button>
+    renderTags() {
+        if (!this.tagsList) return;
+        
+        this.tagsList.innerHTML = State.customIds.map(item => `
+            <div class="tag-item" data-id="${item.id}">
+                <span class="tag-name">${item.name}</span>
+                <button type="button" class="tag-close" title="Xóa">×</button>
             </div>
         `).join('');
         
-        // Keep hidden input
-        this.selectedContainer.innerHTML = `
-            <input type="hidden" id="customWingetIds" value="${this.hiddenInput.value}">
-            ${tagsHtml}
-        `;
-        
-        // Re-assign hidden input reference
-        this.hiddenInput = document.getElementById('customWingetIds');
-        
         // Add remove handlers
-        this.selectedContainer.querySelectorAll('.tag-remove').forEach(btn => {
+        this.tagsList.querySelectorAll('.tag-close').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const tag = e.target.closest('.custom-id-tag');
-                const id = tag.dataset.id;
-                this.removeApp(id);
+                e.stopPropagation();
+                const tag = e.target.closest('.tag-item');
+                this.removeTag(tag.dataset.id);
             });
         });
-    },
-    
-    // Get selected IDs for script generation
-    getSelectedIds() {
-        return this.selectedApps.map(app => app.id);
-    },
-    
-    // Clear all selections
-    clear() {
-        this.selectedApps = [];
-        this.updateHiddenInput();
-        this.renderSelectedTags();
+        
+        // Update placeholder
+        this.searchInput.placeholder = State.customIds.length > 0 
+            ? 'Thêm phần mềm khác...' 
+            : 'Nhập tên hoặc ID phần mềm...';
     }
 };
 
@@ -489,13 +489,8 @@ const WingetSearch = {
 function generateAndDownloadScript() {
     const selectedIds = Array.from(State.selectedSoftware);
     
-    // Get custom Winget IDs from input
-    const customInput = document.getElementById('customWingetIds');
-    const customIdsRaw = customInput ? customInput.value : '';
-    const customIds = customIdsRaw
-        .split(',')
-        .map(id => id.trim())
-        .filter(id => id.length > 0);
+    // Get custom Winget IDs from State
+    const customIds = State.customIds.map(item => item.id);
     
     // Combine selected + custom
     const allIds = [...selectedIds];
@@ -705,8 +700,9 @@ function generateAndDownloadScript() {
     }
     showToast(toastMsg);
     
-    // Clear custom input after download
-    if (customInput) customInput.value = '';
+    // Clear custom IDs after download
+    State.customIds = [];
+    TagsInput.renderTags();
 }
 
 // Download .bat file - Manual byte encoding for CRLF
@@ -900,6 +896,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderOnlineServices();
     initSearch();
     initActionButtons();
-    WingetSearch.init();
+    TagsInput.init();
     State.updateUI();
 });
