@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIO - All-In-One Toolkit</title>
     <link rel="icon" type="image/x-icon" href="assets/logo/favicon.ico">
-    <link rel="stylesheet" href="css/style.css?v=8">
+    <link rel="stylesheet" href="css/style.css?v=9">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -66,8 +66,40 @@
                     <summary class="custom-install-toggle">➕ Cài thêm phần mềm khác (Nhập ID Winget)</summary>
                     <div class="custom-install-content">
                         <input type="text" id="customWingetIds" class="custom-install-input" 
-                               placeholder="Ví dụ: Python.Python.3, Adobe.Acrobat.Reader.64-bit...">
-                        <p class="custom-install-hint">💡 Nhập nhiều ID cách nhau bằng dấu phẩy. Tìm ID tại <a href="https://winget.run" target="_blank">winget.run</a></p>
+                               placeholder="Nhập hoặc click chọn bên dưới..." list="popularApps">
+                        <datalist id="popularApps">
+                            <option value="Adobe.Acrobat.Reader.64-bit">Adobe Acrobat Reader</option>
+                            <option value="Adobe.Photoshop">Adobe Photoshop</option>
+                            <option value="Adobe.Illustrator">Adobe Illustrator</option>
+                            <option value="Autodesk.AutoCAD">AutoCAD</option>
+                            <option value="Python.Python.3.12">Python 3.12</option>
+                            <option value="Oracle.JavaRuntimeEnvironment">Java Runtime</option>
+                            <option value="Microsoft.Office">Microsoft Office</option>
+                            <option value="Notion.Notion">Notion</option>
+                            <option value="Obsidian.Obsidian">Obsidian</option>
+                            <option value="Figma.Figma">Figma</option>
+                            <option value="Canva.Canva">Canva</option>
+                            <option value="BlenderFoundation.Blender">Blender</option>
+                            <option value="Unity.UnityHub">Unity Hub</option>
+                            <option value="EpicGames.EpicGamesLauncher">Epic Games</option>
+                            <option value="Nvidia.GeForceExperience">GeForce Experience</option>
+                            <option value="Logitech.GHUB">Logitech G HUB</option>
+                        </datalist>
+                        
+                        <p class="custom-install-hint">💡 Nhập ID và chọn từ gợi ý, hoặc click nhanh bên dưới:</p>
+                        
+                        <div class="quick-add-tags" id="quickAddTags">
+                            <button type="button" class="quick-tag" data-id="Adobe.Acrobat.Reader.64-bit">📄 Adobe Reader</button>
+                            <button type="button" class="quick-tag" data-id="Python.Python.3.12">🐍 Python</button>
+                            <button type="button" class="quick-tag" data-id="Oracle.JavaRuntimeEnvironment">☕ Java</button>
+                            <button type="button" class="quick-tag" data-id="Notion.Notion">📝 Notion</button>
+                            <button type="button" class="quick-tag" data-id="Figma.Figma">🎨 Figma</button>
+                            <button type="button" class="quick-tag" data-id="BlenderFoundation.Blender">🎬 Blender</button>
+                            <button type="button" class="quick-tag" data-id="Unity.UnityHub">🎮 Unity</button>
+                            <button type="button" class="quick-tag" data-id="Nvidia.GeForceExperience">🖥️ GeForce</button>
+                        </div>
+                        
+                        <p class="custom-install-subhint">🔍 Tìm thêm ID tại <a href="https://winget.run" target="_blank">winget.run</a></p>
                     </div>
                 </details>
 
@@ -132,7 +164,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/software-data.js?v=8"></script>
-    <script src="js/main.js?v=8"></script>
+    <script src="js/software-data.js?v=9"></script>
+    <script src="js/main.js?v=9"></script>
 </body>
 </html>

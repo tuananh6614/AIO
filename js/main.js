@@ -273,6 +273,36 @@ function initActionButtons() {
     });
 }
 
+// Quick Add Tags for Custom Install
+function initQuickAddTags() {
+    const quickTags = document.querySelectorAll('.quick-tag');
+    const customInput = document.getElementById('customWingetIds');
+    
+    quickTags.forEach(tag => {
+        tag.addEventListener('click', () => {
+            const id = tag.dataset.id;
+            if (!id || !customInput) return;
+            
+            // Get current IDs
+            let currentIds = customInput.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            
+            // Toggle: add if not exists, remove if exists
+            const index = currentIds.indexOf(id);
+            if (index === -1) {
+                currentIds.push(id);
+                tag.classList.add('added');
+                showToast('Đã thêm: ' + tag.textContent.trim());
+            } else {
+                currentIds.splice(index, 1);
+                tag.classList.remove('added');
+                showToast('Đã bỏ: ' + tag.textContent.trim());
+            }
+            
+            customInput.value = currentIds.join(', ');
+        });
+    });
+}
+
 // Generate .bat script - Pure ASCII for CMD compatibility
 function generateAndDownloadScript() {
     const selectedIds = Array.from(State.selectedSoftware);
@@ -688,5 +718,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderOnlineServices();
     initSearch();
     initActionButtons();
+    initQuickAddTags();
     State.updateUI();
 });
