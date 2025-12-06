@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIO - All-In-One Toolkit</title>
     <link rel="icon" type="image/x-icon" href="assets/logo/favicon.ico">
-    <link rel="stylesheet" href="css/style.css?v=4">
+    <link rel="stylesheet" href="css/style.css?v=8">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -60,6 +60,16 @@
                     <input type="text" id="searchInput" class="search-input" placeholder="Tìm kiếm phần mềm...">
                     <button class="search-clear" id="clearSearch">×</button>
                 </div>
+
+                <!-- Custom Install -->
+                <details class="custom-install-wrapper">
+                    <summary class="custom-install-toggle">➕ Cài thêm phần mềm khác (Nhập ID Winget)</summary>
+                    <div class="custom-install-content">
+                        <input type="text" id="customWingetIds" class="custom-install-input" 
+                               placeholder="Ví dụ: Python.Python.3, Adobe.Acrobat.Reader.64-bit...">
+                        <p class="custom-install-hint">💡 Nhập nhiều ID cách nhau bằng dấu phẩy. Tìm ID tại <a href="https://winget.run" target="_blank">winget.run</a></p>
+                    </div>
+                </details>
 
                 <!-- Software Grid -->
                 <div class="software-grid" id="softwareCategories">
@@ -122,7 +132,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/software-data.js?v=7"></script>
-    <script src="js/main.js?v=7"></script>
+    <script src="js/software-data.js?v=8"></script>
+    <script src="js/main.js?v=8"></script>
 </body>
 </html>

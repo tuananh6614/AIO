@@ -261,14 +261,33 @@ function initActionButtons() {
     });
     
     DOM.downloadScript.addEventListener('click', () => {
-        if (State.selectedSoftware.size > 0) generateAndDownloadScript();
+        const customInput = document.getElementById('customWingetIds');
+        const hasCustomIds = customInput && customInput.value.trim().length > 0;
+        const hasSelectedSoftware = State.selectedSoftware.size > 0;
+        
+        if (hasSelectedSoftware || hasCustomIds) {
+            generateAndDownloadScript();
+        } else {
+            showToast('Vui long chon phan mem hoac nhap Custom ID!');
+        }
     });
 }
 
 // Generate .bat script - Pure ASCII for CMD compatibility
 function generateAndDownloadScript() {
     const selectedIds = Array.from(State.selectedSoftware);
-    const total = selectedIds.length;
+    
+    // Get custom Winget IDs from input
+    const customInput = document.getElementById('customWingetIds');
+    const customIdsRaw = customInput ? customInput.value : '';
+    const customIds = customIdsRaw
+        .split(',')
+        .map(id => id.trim())
+        .filter(id => id.length > 0);
+    
+    // Combine selected + custom
+    const allIds = [...selectedIds];
+    const total = allIds.length + customIds.length;
     
     // Build script content directly with CRLF
     let script = '';
@@ -397,7 +416,7 @@ function generateAndDownloadScript() {
     addLine('set /a failed=0');
     addLine();
     
-    // Install each software
+    // Install each software from list
     selectedIds.forEach((id, index) => {
         const software = findSoftwareById(id);
         const name = software ? software.name : id;
@@ -420,6 +439,33 @@ function generateAndDownloadScript() {
         addLine();
     });
     
+    // Install custom Winget IDs
+    if (customIds.length > 0) {
+        addLine('echo.');
+        addLine('echo  %E%[95m==================== CUSTOM INSTALL ====================%E%[0m');
+        addLine('echo.');
+        
+        customIds.forEach((id) => {
+            // Use ID as name for custom installs
+            const safeName = id.replace(/[^a-zA-Z0-9\s\-\.\+]/g, '');
+            
+            addLine('set /a current+=1');
+            addLine('echo.');
+            addLine('echo  %E%[35m-----------------------------------------------------------%E%[0m');
+            addLine('echo  %E%[97m[!current!/!total!]%E%[0m %E%[95m[CUSTOM]%E%[0m %E%[38;5;213m' + safeName + '%E%[0m');
+            addLine('echo  %E%[35m-----------------------------------------------------------%E%[0m');
+            addLine('winget install -e --id ' + id + ' --force --accept-package-agreements --accept-source-agreements');
+            addLine('if !errorlevel! equ 0 (');
+            addLine('    echo  %E%[92m[OK]%E%[0m ' + safeName + ' - Thanh cong!');
+            addLine('    set /a success+=1');
+            addLine(') else (');
+            addLine('    echo  %E%[93m[~]%E%[0m ' + safeName + ' - Da co hoac loi');
+            addLine('    set /a failed+=1');
+            addLine(')');
+            addLine();
+        });
+    }
+    
     // Summary with nice box
     addLine('echo.');
     addLine('echo  %E%[36m===========================================================%E%[0m');
@@ -439,7 +485,16 @@ function generateAndDownloadScript() {
     
     // Download as ASCII/ANSI (no BOM, no UTF-8)
     downloadBatFile('AIO-Installer.bat', script);
-    showToast('Da tai script cai dat ' + total + ' phan mem');
+    
+    // Show toast with details
+    let toastMsg = 'Da tai script cai dat ' + total + ' phan mem';
+    if (customIds.length > 0) {
+        toastMsg += ' (bao gom ' + customIds.length + ' custom)';
+    }
+    showToast(toastMsg);
+    
+    // Clear custom input after download
+    if (customInput) customInput.value = '';
 }
 
 // Download .bat file - Manual byte encoding for CRLF
