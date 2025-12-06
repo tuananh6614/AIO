@@ -329,13 +329,22 @@ const WingetSearch = {
         this.showLoading(true);
         
         try {
-            const response = await fetch(`backend/search_winget.php?q=${encodeURIComponent(query)}`);
+            // Direct API call to winget.run (CORS enabled)
+            const apiUrl = `https://api.winget.run/v2/packages?query=${encodeURIComponent(query)}&take=8`;
+            const response = await fetch(apiUrl);
             const data = await response.json();
             
             this.showLoading(false);
             
-            if (data.success && data.data.length > 0) {
-                this.renderResults(data.data);
+            if (data && data.Packages && data.Packages.length > 0) {
+                // Transform API response
+                const packages = data.Packages.map(pkg => ({
+                    id: pkg.Id || '',
+                    name: pkg.Name || pkg.Id || 'Unknown',
+                    publisher: pkg.Publisher || '',
+                    version: pkg.Latest?.Version || ''
+                }));
+                this.renderResults(packages);
             } else {
                 this.renderNoResults(query);
             }
