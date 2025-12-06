@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIO - All-In-One Toolkit</title>
     <link rel="icon" type="image/x-icon" href="assets/logo/favicon.ico">
-    <link rel="stylesheet" href="css/style.css?v=9">
+    <link rel="stylesheet" href="css/style.css?v=10">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -61,51 +61,47 @@
                     <button class="search-clear" id="clearSearch">×</button>
                 </div>
 
-                <!-- Custom Install -->
-                <details class="custom-install-wrapper">
-                    <summary class="custom-install-toggle">➕ Cài thêm phần mềm khác (Nhập ID Winget)</summary>
-                    <div class="custom-install-content">
-                        <input type="text" id="customWingetIds" class="custom-install-input" 
-                               placeholder="Nhập hoặc click chọn bên dưới..." list="popularApps">
-                        <datalist id="popularApps">
-                            <option value="Adobe.Acrobat.Reader.64-bit">Adobe Acrobat Reader</option>
-                            <option value="Adobe.Photoshop">Adobe Photoshop</option>
-                            <option value="Adobe.Illustrator">Adobe Illustrator</option>
-                            <option value="Autodesk.AutoCAD">AutoCAD</option>
-                            <option value="Python.Python.3.12">Python 3.12</option>
-                            <option value="Oracle.JavaRuntimeEnvironment">Java Runtime</option>
-                            <option value="Microsoft.Office">Microsoft Office</option>
-                            <option value="Notion.Notion">Notion</option>
-                            <option value="Obsidian.Obsidian">Obsidian</option>
-                            <option value="Figma.Figma">Figma</option>
-                            <option value="Canva.Canva">Canva</option>
-                            <option value="BlenderFoundation.Blender">Blender</option>
-                            <option value="Unity.UnityHub">Unity Hub</option>
-                            <option value="EpicGames.EpicGamesLauncher">Epic Games</option>
-                            <option value="Nvidia.GeForceExperience">GeForce Experience</option>
-                            <option value="Logitech.GHUB">Logitech G HUB</option>
-                        </datalist>
-                        
-                        <p class="custom-install-hint">💡 Nhập ID và chọn từ gợi ý, hoặc click nhanh bên dưới:</p>
-                        
-                        <div class="quick-add-tags" id="quickAddTags">
-                            <button type="button" class="quick-tag" data-id="Adobe.Acrobat.Reader.64-bit">📄 Adobe Reader</button>
-                            <button type="button" class="quick-tag" data-id="Python.Python.3.12">🐍 Python</button>
-                            <button type="button" class="quick-tag" data-id="Oracle.JavaRuntimeEnvironment">☕ Java</button>
-                            <button type="button" class="quick-tag" data-id="Notion.Notion">📝 Notion</button>
-                            <button type="button" class="quick-tag" data-id="Figma.Figma">🎨 Figma</button>
-                            <button type="button" class="quick-tag" data-id="BlenderFoundation.Blender">🎬 Blender</button>
-                            <button type="button" class="quick-tag" data-id="Unity.UnityHub">🎮 Unity</button>
-                            <button type="button" class="quick-tag" data-id="Nvidia.GeForceExperience">🖥️ GeForce</button>
-                        </div>
-                        
-                        <p class="custom-install-subhint">🔍 Tìm thêm ID tại <a href="https://winget.run" target="_blank">winget.run</a></p>
-                    </div>
-                </details>
-
                 <!-- Software Grid -->
                 <div class="software-grid" id="softwareCategories">
                     <!-- Dynamically generated -->
+                </div>
+
+                <!-- Advanced Custom Install Section -->
+                <div class="advanced-install-section">
+                    <div class="advanced-install-header">
+                        <span class="advanced-icon">🔍</span>
+                        <div class="advanced-text">
+                            <h3>Không thấy phần mềm bạn cần?</h3>
+                            <p>Tìm và thêm bất kỳ phần mềm nào từ kho Winget</p>
+                        </div>
+                    </div>
+                    
+                    <div class="advanced-install-body">
+                        <div class="winget-search-wrapper">
+                            <input type="text" id="wingetSearchInput" class="winget-search-input" 
+                                   placeholder="Nhập tên phần mềm (VD: Valorant, CapCut, Spotify...)">
+                            <div class="winget-search-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                                </svg>
+                            </div>
+                            <div class="winget-loading" id="wingetLoading">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Search Results Dropdown -->
+                        <div class="winget-results" id="wingetResults">
+                            <!-- Dynamically populated -->
+                        </div>
+                        
+                        <!-- Selected Custom IDs -->
+                        <div class="selected-custom-ids" id="selectedCustomIds">
+                            <input type="hidden" id="customWingetIds" value="">
+                        </div>
+                        
+                        <p class="advanced-hint">💡 Gõ tên phần mềm → Chọn từ gợi ý → ID sẽ tự động thêm vào danh sách cài đặt</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -164,7 +160,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="js/software-data.js?v=9"></script>
-    <script src="js/main.js?v=9"></script>
+    <script src="js/software-data.js?v=10"></script>
+    <script src="js/main.js?v=10"></script>
 </body>
 </html>

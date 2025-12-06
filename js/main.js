@@ -273,35 +273,208 @@ function initActionButtons() {
     });
 }
 
-// Quick Add Tags for Custom Install
-function initQuickAddTags() {
-    const quickTags = document.querySelectorAll('.quick-tag');
-    const customInput = document.getElementById('customWingetIds');
+// ========================================
+// Advanced Winget Search (with Debounce & AJAX)
+// ========================================
+const WingetSearch = {
+    searchInput: null,
+    resultsContainer: null,
+    loadingIndicator: null,
+    selectedContainer: null,
+    hiddenInput: null,
+    debounceTimer: null,
+    selectedApps: [], // Array of {id, name}
     
-    quickTags.forEach(tag => {
-        tag.addEventListener('click', () => {
-            const id = tag.dataset.id;
-            if (!id || !customInput) return;
+    init() {
+        this.searchInput = document.getElementById('wingetSearchInput');
+        this.resultsContainer = document.getElementById('wingetResults');
+        this.loadingIndicator = document.getElementById('wingetLoading');
+        this.selectedContainer = document.getElementById('selectedCustomIds');
+        this.hiddenInput = document.getElementById('customWingetIds');
+        
+        if (!this.searchInput) return;
+        
+        // Input event with debounce
+        this.searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
             
-            // Get current IDs
-            let currentIds = customInput.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            clearTimeout(this.debounceTimer);
             
-            // Toggle: add if not exists, remove if exists
-            const index = currentIds.indexOf(id);
-            if (index === -1) {
-                currentIds.push(id);
-                tag.classList.add('added');
-                showToast('Đã thêm: ' + tag.textContent.trim());
-            } else {
-                currentIds.splice(index, 1);
-                tag.classList.remove('added');
-                showToast('Đã bỏ: ' + tag.textContent.trim());
+            if (query.length < 2) {
+                this.hideResults();
+                return;
             }
             
-            customInput.value = currentIds.join(', ');
+            this.debounceTimer = setTimeout(() => {
+                this.search(query);
+            }, 300);
         });
-    });
-}
+        
+        // Hide results when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.advanced-install-body')) {
+                this.hideResults();
+            }
+        });
+        
+        // Focus shows results if available
+        this.searchInput.addEventListener('focus', () => {
+            if (this.resultsContainer.children.length > 0) {
+                this.resultsContainer.classList.add('show');
+            }
+        });
+    },
+    
+    async search(query) {
+        this.showLoading(true);
+        
+        try {
+            const response = await fetch(`backend/search_winget.php?q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+            
+            this.showLoading(false);
+            
+            if (data.success && data.data.length > 0) {
+                this.renderResults(data.data);
+            } else {
+                this.renderNoResults(query);
+            }
+        } catch (error) {
+            console.error('Winget search error:', error);
+            this.showLoading(false);
+            this.renderError();
+        }
+    },
+    
+    renderResults(packages) {
+        this.resultsContainer.innerHTML = packages.map(pkg => `
+            <div class="winget-result-item" data-id="${pkg.id}" data-name="${pkg.name}">
+                <div class="winget-result-icon">${pkg.name.charAt(0).toUpperCase()}</div>
+                <div class="winget-result-info">
+                    <div class="winget-result-name">${pkg.name}</div>
+                    <div class="winget-result-id">${pkg.id}</div>
+                    ${pkg.publisher ? `<div class="winget-result-publisher">by ${pkg.publisher}</div>` : ''}
+                </div>
+                <div class="winget-result-add">+</div>
+            </div>
+        `).join('');
+        
+        // Add click handlers
+        this.resultsContainer.querySelectorAll('.winget-result-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const id = item.dataset.id;
+                const name = item.dataset.name;
+                this.addApp(id, name);
+            });
+        });
+        
+        this.resultsContainer.classList.add('show');
+    },
+    
+    renderNoResults(query) {
+        this.resultsContainer.innerHTML = `
+            <div class="winget-no-results">
+                <p>Không tìm thấy "<strong>${query}</strong>"</p>
+                <p style="font-size: 0.8rem; margin-top: 8px;">Thử từ khóa khác hoặc tìm tại <a href="https://winget.run/search?query=${encodeURIComponent(query)}" target="_blank" style="color: var(--primary);">winget.run</a></p>
+            </div>
+        `;
+        this.resultsContainer.classList.add('show');
+    },
+    
+    renderError() {
+        this.resultsContainer.innerHTML = `
+            <div class="winget-no-results">
+                <p>⚠️ Lỗi kết nối</p>
+                <p style="font-size: 0.8rem;">Vui lòng thử lại sau</p>
+            </div>
+        `;
+        this.resultsContainer.classList.add('show');
+    },
+    
+    hideResults() {
+        this.resultsContainer.classList.remove('show');
+    },
+    
+    showLoading(show) {
+        if (show) {
+            this.loadingIndicator.classList.add('show');
+        } else {
+            this.loadingIndicator.classList.remove('show');
+        }
+    },
+    
+    addApp(id, name) {
+        // Check if already added
+        if (this.selectedApps.some(app => app.id === id)) {
+            showToast('Đã có trong danh sách!');
+            return;
+        }
+        
+        // Add to array
+        this.selectedApps.push({ id, name });
+        
+        // Update hidden input
+        this.updateHiddenInput();
+        
+        // Render tag
+        this.renderSelectedTags();
+        
+        // Clear search input and hide results
+        this.searchInput.value = '';
+        this.hideResults();
+        
+        showToast(`Đã thêm: ${name}`);
+    },
+    
+    removeApp(id) {
+        this.selectedApps = this.selectedApps.filter(app => app.id !== id);
+        this.updateHiddenInput();
+        this.renderSelectedTags();
+    },
+    
+    updateHiddenInput() {
+        this.hiddenInput.value = this.selectedApps.map(app => app.id).join(',');
+    },
+    
+    renderSelectedTags() {
+        const tagsHtml = this.selectedApps.map(app => `
+            <div class="custom-id-tag" data-id="${app.id}">
+                <span class="tag-name">${app.name}</span>
+                <button type="button" class="tag-remove" title="Xóa">×</button>
+            </div>
+        `).join('');
+        
+        // Keep hidden input
+        this.selectedContainer.innerHTML = `
+            <input type="hidden" id="customWingetIds" value="${this.hiddenInput.value}">
+            ${tagsHtml}
+        `;
+        
+        // Re-assign hidden input reference
+        this.hiddenInput = document.getElementById('customWingetIds');
+        
+        // Add remove handlers
+        this.selectedContainer.querySelectorAll('.tag-remove').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tag = e.target.closest('.custom-id-tag');
+                const id = tag.dataset.id;
+                this.removeApp(id);
+            });
+        });
+    },
+    
+    // Get selected IDs for script generation
+    getSelectedIds() {
+        return this.selectedApps.map(app => app.id);
+    },
+    
+    // Clear all selections
+    clear() {
+        this.selectedApps = [];
+        this.updateHiddenInput();
+        this.renderSelectedTags();
+    }
+};
 
 // Generate .bat script - Pure ASCII for CMD compatibility
 function generateAndDownloadScript() {
@@ -718,6 +891,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderOnlineServices();
     initSearch();
     initActionButtons();
-    initQuickAddTags();
+    WingetSearch.init();
     State.updateUI();
 });

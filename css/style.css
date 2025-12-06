@@ -467,129 +467,282 @@ body.dark .theme-toggle .icon-sun { display: none; }
     color: var(--primary);
 }
 
-/* ==================== CUSTOM INSTALL ==================== */
-.custom-install-wrapper {
-    max-width: 600px;
-    margin: 0 auto 25px;
-    background: var(--bg-white);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
+/* ==================== ADVANCED INSTALL SECTION ==================== */
+.advanced-install-section {
+    margin-top: 40px;
+    padding: 30px;
+    background: linear-gradient(135deg, var(--bg-white) 0%, var(--bg-light) 100%);
+    border: 2px solid var(--border-color);
+    border-radius: 20px;
+    position: relative;
     overflow: hidden;
-    transition: var(--transition);
 }
 
-.custom-install-wrapper[open] {
-    border-color: var(--primary);
-    box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.15);
+.advanced-install-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), #f59e0b, var(--primary));
 }
 
-.custom-install-toggle {
-    padding: 14px 20px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--text-dark);
-    cursor: pointer;
-    list-style: none;
+.advanced-install-header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.advanced-icon {
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, var(--primary), #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.advanced-text h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0 0 4px 0;
+}
+
+.advanced-text p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.advanced-install-body {
+    position: relative;
+}
+
+/* Winget Search Input */
+.winget-search-wrapper {
+    position: relative;
+    max-width: 600px;
+}
+
+.winget-search-input {
+    width: 100%;
+    padding: 16px 50px 16px 20px;
+    font-size: 1rem;
+    font-family: inherit;
+    border: 2px solid var(--border-color);
+    border-radius: 14px;
+    background: var(--bg-white);
     transition: var(--transition);
 }
 
-.custom-install-toggle::-webkit-details-marker {
+.winget-search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.15);
+}
+
+.winget-search-input::placeholder {
+    color: var(--text-muted);
+}
+
+.winget-search-icon {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.winget-loading {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
     display: none;
 }
 
-.custom-install-toggle:hover {
-    background: var(--bg-light);
-    color: var(--primary);
+.winget-loading.show {
+    display: block;
 }
 
-.custom-install-content {
-    padding: 0 20px 20px;
+.winget-loading.show + .winget-search-icon {
+    display: none;
 }
 
-.custom-install-input {
-    width: 100%;
-    padding: 14px 16px;
+.spinner {
+    width: 20px;
+    height: 20px;
     border: 2px solid var(--border-color);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Search Results Dropdown */
+.winget-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-width: 600px;
+    background: var(--bg-white);
+    border: 2px solid var(--primary);
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    z-index: 100;
+    max-height: 350px;
+    overflow-y: auto;
+    display: none;
+}
+
+.winget-results.show {
+    display: block;
+}
+
+.winget-result-item {
+    padding: 14px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-light);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.winget-result-item:last-child {
+    border-bottom: none;
+}
+
+.winget-result-item:hover {
+    background: linear-gradient(90deg, rgba(var(--primary-rgb), 0.1), transparent);
+}
+
+.winget-result-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary), #f59e0b);
     border-radius: 10px;
-    font-size: 0.95rem;
-    font-family: inherit;
-    background: var(--bg-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.winget-result-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.winget-result-name {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.winget-result-id {
+    font-size: 0.8rem;
+    color: var(--primary);
+    font-family: 'Consolas', 'Monaco', monospace;
+    background: rgba(var(--primary-rgb), 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.winget-result-publisher {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.winget-result-add {
+    color: var(--primary);
+    font-size: 1.5rem;
+    opacity: 0;
     transition: var(--transition);
 }
 
-.custom-install-input:focus {
-    outline: none;
-    border-color: var(--primary);
-    background: var(--bg-white);
-    box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
+.winget-result-item:hover .winget-result-add {
+    opacity: 1;
 }
 
-.custom-install-input::placeholder {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
-
-.custom-install-hint {
-    margin-top: 10px;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
-
-.custom-install-hint a {
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.custom-install-hint a:hover {
-    text-decoration: underline;
-}
-
-.custom-install-subhint {
-    margin-top: 12px;
-    font-size: 0.8rem;
-    color: var(--text-muted);
+.winget-no-results {
+    padding: 30px;
     text-align: center;
+    color: var(--text-muted);
 }
 
-.custom-install-subhint a {
-    color: var(--primary);
-    text-decoration: none;
-}
-
-/* Quick Add Tags */
-.quick-add-tags {
+/* Selected Custom IDs Tags */
+.selected-custom-ids {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-top: 12px;
+    margin-top: 16px;
 }
 
-.quick-tag {
-    padding: 8px 14px;
-    background: var(--bg-light);
-    border: 1px solid var(--border-color);
+.custom-id-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, var(--primary), #f59e0b);
+    color: white;
     border-radius: 20px;
     font-size: 0.85rem;
-    cursor: pointer;
-    transition: var(--transition);
+    font-weight: 500;
+    animation: tagPop 0.3s ease;
+}
+
+@keyframes tagPop {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.custom-id-tag .tag-name {
+    max-width: 150px;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.quick-tag:hover {
-    background: var(--primary);
+.custom-id-tag .tag-remove {
+    background: rgba(255,255,255,0.3);
+    border: none;
     color: white;
-    border-color: var(--primary);
-    transform: translateY(-2px);
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    transition: var(--transition);
 }
 
-.quick-tag.added {
-    background: var(--success);
-    color: white;
-    border-color: var(--success);
+.custom-id-tag .tag-remove:hover {
+    background: rgba(255,255,255,0.5);
+}
+
+.advanced-hint {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-align: center;
 }
 
 /* ==================== SOFTWARE GRID ==================== */
